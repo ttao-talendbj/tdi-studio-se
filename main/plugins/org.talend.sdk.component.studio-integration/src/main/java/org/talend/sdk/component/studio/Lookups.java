@@ -40,6 +40,7 @@ import org.talend.sdk.component.studio.service.ComponentService;
 import org.talend.sdk.component.studio.service.Configuration;
 import org.talend.sdk.component.studio.service.UiActionsThreadPool;
 import org.talend.sdk.component.studio.ui.composite.TaCoKitComposite;
+import org.talend.sdk.component.studio.util.TaCoKitConst;
 import org.talend.sdk.component.studio.websocket.WebSocketClient;
 
 public final class Lookups {
@@ -134,7 +135,7 @@ public final class Lookups {
     }
 
     private static <T> T lookup(final Class<T> type) {
-        final BundleContext context = Platform.getBundle("org.talend.sdk.component.studio-integration").getBundleContext();
+        final BundleContext context = Platform.getBundle(TaCoKitConst.BUNDLE_ID).getBundleContext();
         final ServiceReference<T> clientRef = context.getServiceReference(type);
         return context.getService(clientRef);
     }

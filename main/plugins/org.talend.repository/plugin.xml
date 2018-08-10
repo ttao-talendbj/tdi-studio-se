@@ -3093,6 +3093,15 @@
               name="RenameELTJDBCComponentsMigrationTask"
               version="7.1.1">
         </projecttask>
+        <projecttask
+              beforeLogon="false"
+              breaks="6.3.2"
+              class="org.talend.repository.model.migration.spark.UseSqlDateTypeInDataframesTask"
+              description="Keep Date type for component impacted by change from Date to Timestamp"
+              id="org.talend.repository.model.migration.Aspark.UseSqlDateTypeInDataframesTask"
+              name="AddSchemaDatePatternUseForImpalaTask"
+              version="6.3.2">
+        </projecttask>
    </extension>
 
    <extension

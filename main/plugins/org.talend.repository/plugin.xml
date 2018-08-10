@@ -3099,7 +3099,7 @@
               class="org.talend.repository.model.migration.spark.UseSqlDateTypeInDataframesTask"
               description="Keep Date type for component impacted by change from Date to Timestamp"
               id="org.talend.repository.model.migration.spark.UseSqlDateTypeInDataframesTask"
-              name="AddSchemaDatePatternUseForImpalaTask"
+              name="UseSqlDateTypeInDataframesTask"
               version="6.3.2">
         </projecttask>
    </extension>

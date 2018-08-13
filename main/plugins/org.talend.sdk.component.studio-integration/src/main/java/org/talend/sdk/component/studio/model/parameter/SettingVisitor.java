@@ -112,7 +112,7 @@ public class SettingVisitor implements PropertyVisitor {
             new LinkedHashMap<>();
 
     private final List<ParameterResolver> actionResolvers = new ArrayList<>();
-    
+
     private final AbsolutePathResolver pathResolver = new AbsolutePathResolver();
 
     public SettingVisitor(final IElement iNode,
@@ -350,7 +350,7 @@ public class SettingVisitor implements PropertyVisitor {
 
         return createSchemaParameter(connectionName, schemaName, discoverSchemaAction, true);
     }
-    
+
     private ValueSelectionParameter visitValueSelection(final PropertyNode node) {
         final SuggestionsAction action = createSuggestionsAction(node);
         final ValueSelectionParameter parameter = new ValueSelectionParameter(element, action);
@@ -365,7 +365,7 @@ public class SettingVisitor implements PropertyVisitor {
         actionResolvers.add(resolver);
         return action;
     }
-    
+
     // TODO i18n it
     private String schemaDisplayName(final String connectionName, final String schemaName) {
         final String connectorName = connectionName.equalsIgnoreCase(EConnectionType.FLOW_MAIN.getName())
@@ -507,10 +507,13 @@ public class SettingVisitor implements PropertyVisitor {
 
         node.getProperty().getCondition()
                 .forEach(c -> {
-                    c.setTargetPath(pathResolver.resolvePath(node.getProperty().getPath(), c.getTarget()));
-                    activations.computeIfAbsent(origin.getProperty().getPath(), (key) -> new HashMap<>());
-                    activations.get(origin.getProperty().getPath()).computeIfAbsent(level, (k) -> new ArrayList<>());
-                    activations.get(origin.getProperty().getPath()).get(level).add(c);
+                    final String targetPath = pathResolver.resolvePath(node.getProperty().getPath(), c.getTarget());
+                    if (targetPath != null && !targetPath.isEmpty()) {
+                        c.setTargetPath(targetPath);
+                        activations.computeIfAbsent(origin.getProperty().getPath(), (key) -> new HashMap<>());
+                        activations.get(origin.getProperty().getPath()).computeIfAbsent(level, (k) -> new ArrayList<>());
+                        activations.get(origin.getProperty().getPath()).get(level).add(c);
+                    }
                 });
 
         final int l = level + 1;

@@ -27,12 +27,10 @@ public class AbsolutePathResolver {
      * Resolves absolute path of parameter from given {@code nodePath} and parameter
      * relative path. Resolution is done according rules described in component-api
      * Validable annotation.
-     * 
-     * @param nodePath
-     *            given node absolute path (ex: root.part2.part3)
-     * @param parameterReference
-     *            relative path which should be resolved using nodePath (ex:
-     *            ../part1/part2)
+     *
+     * @param nodePath           given node absolute path (ex: root.part2.part3)
+     * @param parameterReference relative path which should be resolved using nodePath (ex:
+     *                           ../part1/part2)
      * @return parameter/node absolute path
      */
     public String resolvePath(final String nodePath, final String parameterReference) {
@@ -55,10 +53,9 @@ public class AbsolutePathResolver {
      * If relative path starts with path part, but not with "." or "../", then "../"
      * is added in the beggining. According resolution rules {@code sibling/child}
      * path is equavalent to {@code ../sibling/child}
-     * 
-     * @param parameterReference
-     *            relative path which should be resolved using nodePath (ex:
-     *            ../part1/part2)
+     *
+     * @param parameterReference relative path which should be resolved using nodePath (ex:
+     *                           ../part1/part2)
      * @return normalized path which starts with either "." or "../"
      */
     private String normalizePath(final String parameterReference) {
@@ -67,8 +64,8 @@ public class AbsolutePathResolver {
 
     /**
      * Resolves absolute path from relative parameterReference path
-     * 
-     * @param nodePath node absolute path
+     *
+     * @param nodePath           node absolute path
      * @param parameterReference relative parameter reference path
      * @return resolved path
      */
@@ -82,11 +79,10 @@ public class AbsolutePathResolver {
             while (ref.startsWith("..")) {
                 final int lastDot = current.lastIndexOf('.');
                 if (lastDot < 0) {
-                    ref = "";
-                    break;
+                    return null; // property not found
                 }
                 current = current.substring(0, lastDot);
-                ref = ref.substring("..".length(), ref.length());
+                ref = ref.substring(2 /*"..".length()*/);
                 if (ref.startsWith("/")) {
                     ref = ref.substring(1);
                 }

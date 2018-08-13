@@ -184,6 +184,12 @@ public class ResourceDependenciesUtil {
             statePath = item.getState().getPath() + SEG_TAG;
         }
         String fileSuffix = "_" + version + "." + item.getBindingExtension();
+        // for job testjob_0.2 => testjob_0_2
+        String checkversion = jobLabel.substring(jobLabel.lastIndexOf("_"));
+        if (checkversion.contains(".")) {
+            jobLabel = jobLabel.substring(0, jobLabel.lastIndexOf("_")) + checkversion.replace(".", "_");
+        }
+        // Local_Project/testjob_0_2/resources/test_0.1.txt
         String newFilePath = currentProject.getLabel() + SEG_TAG + jobLabel + SEG_TAG + SRC_RESOURCES_FOLDER + SEG_TAG + statePath
                 + item.getName() + fileSuffix;
         return newFilePath;

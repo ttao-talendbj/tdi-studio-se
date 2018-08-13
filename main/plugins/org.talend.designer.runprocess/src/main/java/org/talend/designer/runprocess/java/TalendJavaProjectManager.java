@@ -550,7 +550,7 @@ public class TalendJavaProjectManager {
 
     private static void SynchronizeResourceFile(Property property) throws Exception {
         String resources = (String) property.getAdditionalProperties().get("RESOURCES_PROP");
-        if (StringUtils.isBlank(resources.trim())) {
+        if (StringUtils.isBlank(resources)) {
             return;
         }
         for (String res : resources.split(",")) {

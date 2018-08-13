@@ -25,11 +25,8 @@ import org.talend.core.model.components.filters.NameComponentFilter;
 import org.talend.core.model.migration.AbstractJobMigrationTask;
 import org.talend.core.model.properties.Item;
 import org.talend.core.model.repository.ERepositoryObjectType;
-import org.talend.designer.core.model.utils.emf.talendfile.ColumnType;
-import org.talend.designer.core.model.utils.emf.talendfile.MetadataType;
 import org.talend.designer.core.model.utils.emf.talendfile.NodeType;
 import org.talend.designer.core.model.utils.emf.talendfile.ProcessType;
-import org.talend.repository.model.migration.SetReadByJSONPathToFalse.AddReadByXPath;
 
 /**
  * 

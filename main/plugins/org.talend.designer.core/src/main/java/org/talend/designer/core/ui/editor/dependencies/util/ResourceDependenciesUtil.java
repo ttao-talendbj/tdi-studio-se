@@ -231,6 +231,11 @@ public class ResourceDependenciesUtil {
             statePath = item.getState().getPath() + SEG_TAG;
         }
         String extResPath = POMS_PROCESS_FOLDER + jobLabel + SRC_EXTRESOURCE_FOLDER;
+        // for job testjob_0.2 => testjob_0_2
+        String checkversion = jobLabel.substring(jobLabel.lastIndexOf("_"));
+        if (checkversion.contains(".")) {
+            jobLabel = jobLabel.substring(0, jobLabel.lastIndexOf("_")) + checkversion.replace(".", "_");
+        }
         String newFilePath = currentProject.getLabel() + SEG_TAG + jobLabel + SEG_TAG + SRC_RESOURCES_FOLDER + SEG_TAG
                 + statePath;
         File targetFolder = new File(projectWorkspace + SEG_TAG + extResPath + SEG_TAG + newFilePath);

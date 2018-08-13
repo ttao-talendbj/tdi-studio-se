@@ -255,7 +255,7 @@ public class TalendJavaProjectManager {
                 }
             }
             // Synchronize resource that job dependencies (copy to src/main/ext-resources)
-            SynchronizeResourceFile(property);
+            synchronizeResourceFile(property);
         } catch (Exception e) {
             ExceptionHandler.process(e);
         }
@@ -548,7 +548,7 @@ public class TalendJavaProjectManager {
                 item.getProperty());
     }
 
-    private static void SynchronizeResourceFile(Property property) throws Exception {
+    private static void synchronizeResourceFile(Property property) throws Exception {
         String resources = (String) property.getAdditionalProperties().get("RESOURCES_PROP");
         if (StringUtils.isBlank(resources)) {
             return;

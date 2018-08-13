@@ -15,6 +15,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 import org.talend.core.model.repository.ERepositoryObjectType;
+import org.talend.designer.core.i18n.Messages;
 import org.talend.repository.model.IRepositoryNode;
 import org.talend.repository.viewer.ui.provider.RepositoryViewerProvider;
 import org.talend.repository.viewer.ui.viewer.RepositoryTreeViewer;
@@ -33,7 +34,7 @@ public class DependenciesResourceSelectionDialog extends Dialog {
 
     protected void configureShell(Shell shell) {
         super.configureShell(shell);
-        shell.setText("Select a Route Resource");
+        shell.setText(Messages.getString("DependenciesResourceSelectionDialog.selectResource")); //$NON-NLS-1$
     }
 
     @Override

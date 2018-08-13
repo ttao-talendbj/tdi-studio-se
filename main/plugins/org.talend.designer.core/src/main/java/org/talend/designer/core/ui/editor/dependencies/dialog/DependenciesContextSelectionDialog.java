@@ -58,7 +58,7 @@ public class DependenciesContextSelectionDialog extends Dialog {
 
     protected void configureShell(Shell shell) {
         super.configureShell(shell);
-        shell.setText("Select a Context");
+        shell.setText(Messages.getString("DependenciesContextSelectionDialog.selectContext")); //$NON-NLS-1$
     }
 
     @Override

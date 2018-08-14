@@ -229,6 +229,12 @@ public class TaCoKitUtil {
             gav.setGroupId(component[0]);
             gav.setArtifactId(component[1]);
             gav.setVersion(component[2]);
+            if (3 < component.length) {
+                gav.setClassifier(component[3]);
+            }
+            if (4 < component.length) {
+                gav.setType(component[4]);
+            }
             gavs.add(gav);
         }
         return gavs;
@@ -248,14 +254,20 @@ public class TaCoKitUtil {
 
         private String artifactId;
 
-        private String version;
+        private String version = ""; //$NON-NLS-1$
+
+        private String classifier = ""; //$NON-NLS-1$
+
+        private String type = ""; //$NON-NLS-1$
 
         @Override
         public int hashCode() {
             final int prime = 31;
             int result = 1;
             result = prime * result + ((this.artifactId == null) ? 0 : this.artifactId.hashCode());
+            result = prime * result + ((this.classifier == null) ? 0 : this.classifier.hashCode());
             result = prime * result + ((this.groupId == null) ? 0 : this.groupId.hashCode());
+            result = prime * result + ((this.type == null) ? 0 : this.type.hashCode());
             result = prime * result + ((this.version == null) ? 0 : this.version.hashCode());
             return result;
         }
@@ -274,10 +286,20 @@ public class TaCoKitUtil {
                     return false;
             } else if (!this.artifactId.equals(other.artifactId))
                 return false;
+            if (this.classifier == null) {
+                if (other.classifier != null)
+                    return false;
+            } else if (!this.classifier.equals(other.classifier))
+                return false;
             if (this.groupId == null) {
                 if (other.groupId != null)
                     return false;
             } else if (!this.groupId.equals(other.groupId))
+                return false;
+            if (this.type == null) {
+                if (other.type != null)
+                    return false;
+            } else if (!this.type.equals(other.type))
                 return false;
             if (this.version == null) {
                 if (other.version != null)
@@ -290,7 +312,8 @@ public class TaCoKitUtil {
         @SuppressWarnings("nls")
         @Override
         public String toString() {
-            return "GAV [groupId=" + this.groupId + ", artifactId=" + this.artifactId + ", version=" + this.version + "]";
+            return "GAV [groupId=" + this.groupId + ", artifactId=" + this.artifactId + ", version=" + this.version
+                    + ", classifier=" + this.classifier + ", type=" + this.type + "]";
         }
 
         public String getGroupId() {
@@ -315,6 +338,22 @@ public class TaCoKitUtil {
 
         public void setVersion(String version) {
             this.version = version;
+        }
+
+        public String getClassifier() {
+            return this.classifier;
+        }
+
+        public void setClassifier(String classifier) {
+            this.classifier = classifier;
+        }
+
+        public String getType() {
+            return this.type;
+        }
+
+        public void setType(String type) {
+            this.type = type;
         }
 
     }

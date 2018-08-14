@@ -14,16 +14,19 @@ package org.talend.sdk.component.studio.update;
 
 import java.io.File;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.URIUtil;
+import org.talend.commons.CommonsPlugin;
 import org.talend.commons.exception.ExceptionHandler;
 import org.talend.commons.runtime.service.ITaCoKitService;
 import org.talend.sdk.component.studio.i18n.Messages;
@@ -49,64 +52,95 @@ public class TaCoKitCarFeature implements ITaCoKitCarFeature {
     @Override
     public boolean isInstalled(IProgressMonitor progress) throws Exception {
         boolean isInstalled = false;
-        List<GAV> installedGavs = TaCoKitUtil.getInstalledComponents(progress);
-        if (installedGavs != null && !installedGavs.isEmpty()) {
+        List<GAV> installedComponents = TaCoKitUtil.getInstalledComponents(progress);
+        if (installedComponents != null && !installedComponents.isEmpty()) {
             TaCoKitUtil.checkMonitor(progress);
             List<GAV> newComponents = getCar().getComponents();
             if (newComponents != null) {
-                // 1. as long as there is one component not be installed, we consider the car is not
-                // installed<br/>
-                // 2. if there is a newer version component installed, we consider the component is installed.
-                List<GAV> installedComponents = new ArrayList<>();
-                for (GAV newComponent : newComponents) {
-                    TaCoKitUtil.checkMonitor(progress);
-                    boolean alreadyInstalled = false;
-                    for (GAV installedGav : installedGavs) {
-                        TaCoKitUtil.checkMonitor(progress);
-                        if (alreadyInstalled) {
-                            break;
-                        }
-                        try {
-                            if (StringUtils.equals(installedGav.getGroupId() + ":" + installedGav.getArtifactId(), //$NON-NLS-1$
-                                    newComponent.getGroupId() + ":" + newComponent.getArtifactId())) { //$NON-NLS-1$
-                                // version format like: 1.0.0-SNAPSHOT
-                                String installedVersionString = installedGav.getVersion().split("-")[0]; //$NON-NLS-1$
-                                String newVersionString = newComponent.getVersion().split("-")[0]; //$NON-NLS-1$
-                                String[] installedVersion = installedVersionString.split("\\."); //$NON-NLS-1$
-                                String[] newVersion = newVersionString.split("\\."); //$NON-NLS-1$
-                                alreadyInstalled = true;
-                                for (int i = 0; i < newVersion.length; ++i) {
-                                    if (installedVersion.length - 1 < i) {
-                                        alreadyInstalled = false;
-                                        break;
-                                    }
-                                    int iVersion = Integer.valueOf(installedVersion[i]);
-                                    int nVersion = Integer.valueOf(newVersion[i]);
-                                    if (iVersion < nVersion) {
-                                        alreadyInstalled = false;
-                                        break;
-                                    }
-                                }
-                            }
-                        } catch (Exception e) {
-                            alreadyInstalled = true;
-                            ExceptionHandler.process(e);
-                        }
-                    }
-                    if (alreadyInstalled) {
-                        installedComponents.add(newComponent);
-                    }
-                }
+                Map<GAV, GAV> alreadyInstalledComponentMap = filterAlreadyInstalledComponent(installedComponents, newComponents,
+                        progress);
 
-                if (installedComponents.size() < newComponents.size()) {
+                if (alreadyInstalledComponentMap.size() < newComponents.size()) {
                     // means there are new components not been installed yet
                     isInstalled = false;
                 } else {
+                    // TODO
+                    if (CommonsPlugin.isHeadless()) {
+                        // commandline
+                    } else {
+                        // GUI
+                    }
                     isInstalled = true;
                 }
             }
         }
         return isInstalled;
+    }
+
+    /**
+     * 1. As long as there is one component not be installed, we consider the car is not installed<br/>
+     * 2. If there is a newer version component installed, we consider the component is installed.
+     * 
+     * @return Map<GAV, GAV> newComponent to installedComponent
+     */
+    private Map<GAV, GAV> filterAlreadyInstalledComponent(List<GAV> installedComponents, List<GAV> newComponents,
+            IProgressMonitor progress) throws Exception {
+        Map<GAV, GAV> alreadyInstalledComponentMap = new HashMap<>();
+        for (GAV newComponent : newComponents) {
+            TaCoKitUtil.checkMonitor(progress);
+            boolean alreadyInstalled = false;
+            GAV curInstalledComponent = null;
+            for (GAV installedComponent : installedComponents) {
+                TaCoKitUtil.checkMonitor(progress);
+                if (alreadyInstalled) {
+                    break;
+                }
+                try {
+                    if (StringUtils.equals(
+                            installedComponent.getGroupId() + ":" + installedComponent.getArtifactId() + ":" //$NON-NLS-1$ //$NON-NLS-2$
+                                    + installedComponent.getClassifier() + ":" + installedComponent.getType(), //$NON-NLS-1$
+                            newComponent.getGroupId() + ":" + newComponent.getArtifactId() + ":" //$NON-NLS-1$ //$NON-NLS-2$
+                                    + newComponent.getClassifier() + ":" + newComponent.getType())) { //$NON-NLS-1$
+                        // version format like: 1.0.0-SNAPSHOT
+                        String installedVersionString = installedComponent.getVersion().split("-")[0]; //$NON-NLS-1$
+                        String newVersionString = newComponent.getVersion().split("-")[0]; //$NON-NLS-1$
+                        String[] installedVersion = installedVersionString.split("\\."); //$NON-NLS-1$
+                        String[] newVersion = newVersionString.split("\\."); //$NON-NLS-1$
+                        alreadyInstalled = true;
+                        for (int i = 0; i < newVersion.length; ++i) {
+                            if (installedVersion.length - 1 < i) {
+                                alreadyInstalled = false;
+                                break;
+                            }
+                            try {
+                                int iVersion = Integer.valueOf(installedVersion[i]);
+                                int nVersion = Integer.valueOf(newVersion[i]);
+                                if (iVersion < nVersion) {
+                                    alreadyInstalled = false;
+                                    break;
+                                }
+                            } catch (NumberFormatException e) {
+                                if (StringUtils.compare(installedVersion[i], newVersion[i]) < 0) {
+                                    alreadyInstalled = false;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    alreadyInstalled = true;
+                    ExceptionHandler.process(e);
+                } finally {
+                    if (alreadyInstalled) {
+                        curInstalledComponent = installedComponent;
+                    }
+                }
+            }
+            if (alreadyInstalled) {
+                alreadyInstalledComponentMap.put(newComponent, curInstalledComponent);
+            }
+        }
+        return alreadyInstalledComponentMap;
     }
 
     @Override
@@ -136,10 +170,15 @@ public class TaCoKitCarFeature implements ITaCoKitCarFeature {
         return status;
     }
 
+    @SuppressWarnings("nls")
     public boolean install(IProgressMonitor progress) throws Exception {
         TaCoKitCar tckCar = getCar();
-        String[] carCmd = new String[] { "java", "-jar", "\"" + tckCar.getCarFile().getAbsolutePath() + "\"", "studio-deploy", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
-                "\"" + URIUtil.toFile(Platform.getInstallLocation().getURL().toURI()).getAbsolutePath() + "\"" }; //$NON-NLS-1$ //$NON-NLS-2$
+        String[] carCmd = new String[] {
+                new File(System.getProperty("java.home"),
+                        "bin/java" + (System.getProperty("os.name").toLowerCase(Locale.ROOT).contains("win") ? ".exe" : ""))
+                        .getAbsolutePath(),
+                "-jar", "\"" + tckCar.getCarFile().getAbsolutePath() + "\"", "studio-deploy",
+                "\"" + URIUtil.toFile(Platform.getInstallLocation().getURL().toURI()).getAbsolutePath() + "\"" };
         Process exec = Runtime.getRuntime().exec(carCmd);
         while (exec.isAlive()) {
             Thread.sleep(100);

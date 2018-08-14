@@ -73,7 +73,8 @@ public class TaCoKitCar implements Comparable<Object> {
         if (0 < components.size()) {
             GAV gav = components.get(0);
             name = gav.getArtifactId();
-            description = gav.getGroupId() + ":" + gav.getArtifactId() + ":" + gav.getVersion(); //$NON-NLS-1$ //$NON-NLS-2$
+            description = gav.getGroupId() + ":" + gav.getArtifactId() + ":" + gav.getVersion() + ":" + gav.getClassifier() + ":" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+                    + gav.getType();
         }
         if (StringUtils.isBlank(name)) {
             name = Messages.getString("TaCoKitCar.defaultName"); //$NON-NLS-1$

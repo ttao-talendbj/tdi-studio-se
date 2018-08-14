@@ -190,7 +190,13 @@ public class ResourceDependenciesUtil {
             jobLabel = jobLabel.substring(0, jobLabel.lastIndexOf("_")) + checkversion.replace(".", "_");
         }
         // Local_Project/testjob_0_2/resources/test_0.1.txt
-        String newFilePath = currentProject.getLabel() + SEG_TAG + jobLabel + SEG_TAG + SRC_RESOURCES_FOLDER + SEG_TAG + statePath
+        /*
+         * Local_Project project Label need to lower case avoid the exception of
+         * org.eclipse.core.internal.resources.ResourceException: A resource exists with a different case caused by
+         * ext-resources/local_project/testjob_0_2/contexts
+         */
+        String newFilePath = currentProject.getLabel().toLowerCase() + SEG_TAG + jobLabel + SEG_TAG + SRC_RESOURCES_FOLDER
+                + SEG_TAG + statePath
                 + item.getName() + fileSuffix;
         return newFilePath;
     }
@@ -236,7 +242,8 @@ public class ResourceDependenciesUtil {
         if (checkversion.contains(".")) {
             jobLabel = jobLabel.substring(0, jobLabel.lastIndexOf("_")) + checkversion.replace(".", "_");
         }
-        String newFilePath = currentProject.getLabel() + SEG_TAG + jobLabel + SEG_TAG + SRC_RESOURCES_FOLDER + SEG_TAG
+        String newFilePath = currentProject.getLabel().toLowerCase() + SEG_TAG + jobLabel + SEG_TAG + SRC_RESOURCES_FOLDER
+                + SEG_TAG
                 + statePath;
         File targetFolder = new File(projectWorkspace + SEG_TAG + extResPath + SEG_TAG + newFilePath);
         if (targetFolder.exists() && targetFolder.isDirectory()) {

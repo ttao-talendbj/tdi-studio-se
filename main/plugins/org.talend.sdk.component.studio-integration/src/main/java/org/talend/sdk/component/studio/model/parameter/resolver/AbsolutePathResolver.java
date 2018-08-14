@@ -16,6 +16,7 @@
 package org.talend.sdk.component.studio.model.parameter.resolver;
 
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Resolves PropertyNode path from given PropertyNode and relative path This is
@@ -33,7 +34,7 @@ public class AbsolutePathResolver {
      *                           ../part1/part2)
      * @return parameter/node absolute path
      */
-    public String resolvePath(final String nodePath, final String parameterReference) {
+    public Optional<String> resolvePath(final String nodePath, final String parameterReference) {
         check(nodePath, parameterReference);
         return doResolvePath(nodePath, normalizePath(parameterReference));
     }
@@ -69,9 +70,9 @@ public class AbsolutePathResolver {
      * @param parameterReference relative parameter reference path
      * @return resolved path
      */
-    private String doResolvePath(final String nodePath, final String parameterReference) {
+    private Optional<String> doResolvePath(final String nodePath, final String parameterReference) {
         if (".".equals(parameterReference)) {
-            return nodePath;
+            return Optional.of(nodePath);
         }
         if (parameterReference.startsWith("..")) {
             String current = nodePath;
@@ -79,7 +80,7 @@ public class AbsolutePathResolver {
             while (ref.startsWith("..")) {
                 final int lastDot = current.lastIndexOf('.');
                 if (lastDot < 0) {
-                    return null; // property not found
+                    return Optional.empty(); // property not found
                 }
                 current = current.substring(0, lastDot);
                 ref = ref.substring(2 /*"..".length()*/);
@@ -87,11 +88,11 @@ public class AbsolutePathResolver {
                     ref = ref.substring(1);
                 }
             }
-            return current + (!ref.isEmpty() ? "." : "") + ref.replace('/', '.');
+            return Optional.of(current + (!ref.isEmpty() ? "." : "") + ref.replace('/', '.'));
         }
         if (parameterReference.startsWith(".") || parameterReference.startsWith("./")) {
-            return nodePath + '.' + parameterReference.replaceFirst("\\./?", "").replace('/', '.');
+            return Optional.of(nodePath + '.' + parameterReference.replaceFirst("\\./?", "").replace('/', '.'));
         }
-        return parameterReference;
+        return Optional.of(parameterReference);
     }
 }

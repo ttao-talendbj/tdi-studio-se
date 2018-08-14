@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.talend.core.model.process.IElementParameter;
@@ -69,16 +70,16 @@ abstract class AbstractParameterResolver implements ParameterResolver {
 
         relativePaths.forEach(relativePath -> {
             if (expectedParameters.hasNext()) {
-                final String absolutePath = pathResolver.resolvePath(getOwnerPath(), relativePath);
-                if (absolutePath != null && !absolutePath.isEmpty()) {
-                    final List<TaCoKitElementParameter> parameters = findParameters(absolutePath, settings);
+                final Optional<String> absolutePath = pathResolver.resolvePath(getOwnerPath(), relativePath);
+                if (absolutePath.isPresent()) {
+                    final List<TaCoKitElementParameter> parameters = findParameters(absolutePath.get(), settings);
                     final SimplePropertyDefinition parameterRoot = expectedParameters.next();
                     parameters.forEach(parameter -> {
                         parameter.registerListener("value", listener);
                         if (redrawParameter != null) {
                             parameter.setRedrawParameter(redrawParameter);
                         }
-                        final String callbackProperty = parameter.getName().replaceFirst(absolutePath, parameterRoot.getPath());
+                        final String callbackProperty = parameter.getName().replaceFirst(absolutePath.get(), parameterRoot.getPath());
                         final IActionParameter actionParameter = parameter.createActionParameter(callbackProperty);
                         action.addParameter(actionParameter);
                     });

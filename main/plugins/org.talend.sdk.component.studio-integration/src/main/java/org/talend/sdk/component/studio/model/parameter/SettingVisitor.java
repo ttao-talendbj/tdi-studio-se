@@ -33,8 +33,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.TreeMap;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.talend.core.model.process.EComponentCategory;
 import org.talend.core.model.process.EConnectionType;
 import org.talend.core.model.process.EParameterFieldType;
@@ -69,6 +72,8 @@ import org.talend.sdk.component.studio.util.TaCoKitUtil;
  * Creates properties from leafs
  */
 public class SettingVisitor implements PropertyVisitor {
+
+    private final static Logger LOGGER = LoggerFactory.getLogger(SettingVisitor.class.getName());
 
     /**
      * Specifies row number, on which schema properties (schema widget and guess schema button) should be displayed
@@ -507,12 +512,14 @@ public class SettingVisitor implements PropertyVisitor {
 
         node.getProperty().getCondition()
                 .forEach(c -> {
-                    final String targetPath = pathResolver.resolvePath(node.getProperty().getPath(), c.getTarget());
-                    if (targetPath != null && !targetPath.isEmpty()) {
-                        c.setTargetPath(targetPath);
+                    final Optional<String> targetPath = pathResolver.resolvePath(node.getProperty().getPath(), c.getTarget());
+                    if (targetPath.isPresent()) {
+                        c.setTargetPath(targetPath.get());
                         activations.computeIfAbsent(origin.getProperty().getPath(), (key) -> new HashMap<>());
                         activations.get(origin.getProperty().getPath()).computeIfAbsent(level, (k) -> new ArrayList<>());
                         activations.get(origin.getProperty().getPath()).get(level).add(c);
+                    } else {
+                        LOGGER.warn("can't find target property '" + c.getTarget() + "' used on property '" + c.getSourcePath() + "'");
                     }
                 });
 

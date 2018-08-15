@@ -354,7 +354,7 @@
       FIELD="TEXT"
       NUM_ROW="52"
       REQUIRED="true"
-      SHOW_IF="DEFINE_DATA_CHARSET=='true'">
+      SHOW_IF="DEFINE_DATA_CHARSET=='true' AND CUSTOM_SCRIPT=='false'">
       <DEFAULT>"ASCII"</DEFAULT>
     </PARAMETER>
 

@@ -120,7 +120,23 @@ public class TaCoKitCarFeature implements ITaCoKitCarFeature {
                                     break;
                                 }
                             } catch (NumberFormatException e) {
-                                if (StringUtils.compare(installedVersion[i], newVersion[i]) < 0) {
+                                String installedVersionStr = installedVersion[i];
+                                String newVersionStr = newVersion[i];
+                                int compareResult = 0;
+                                if (installedVersionStr == null || newVersionStr == null) {
+                                    if (installedVersionStr == null && newVersionStr == null) {
+                                        compareResult = 0;
+                                    } else {
+                                        if (installedVersionStr == null) {
+                                            compareResult = -1;
+                                        } else {
+                                            compareResult = 1;
+                                        }
+                                    }
+                                } else {
+                                    compareResult = installedVersionStr.compareTo(newVersionStr);
+                                }
+                                if (compareResult < 0) {
                                     alreadyInstalled = false;
                                     break;
                                 }

@@ -43,6 +43,7 @@
     String checkAll = ElementParameterParser.getValue(node, "__CHECK_ALL__");
     final boolean bIsTrim = "true".equals(ElementParameterParser.getValue(node, "__SUB_STRING__"));
     final boolean useFasteDateChecker = "true".equals(ElementParameterParser.getValue(node, "__FAST_DATE_CHECK__"));
+    final boolean useStrictDateChecker = "true".equals(ElementParameterParser.getValue(node, "__STRICT_DATE_CHECK__"));
     final boolean emptyIsNull = "true".equals(ElementParameterParser.getValue(node, "__EMPTY_IS_NULL__"));
     final boolean allEmptyAreNull = "true".equals(ElementParameterParser.getValue(node, "__ALL_EMPTY_ARE_NULL__"));
 
@@ -293,33 +294,35 @@
 %>
         ){
 <%
-                    if (!useFasteDateChecker) { //CONDITION_001512 START
+                    if (!useFasteDateChecker && !useStrictDateChecker) { //CONDITION_001512 START
 %>
-            if (!TalendDate.isDate((<%=_sInConnName%>.<%=colName%>).toString(), <%=pattern%>,<%if(ignoreTimeZone){%>true<%}else{%>false<%}%>))
-                throw new IllegalArgumentException("Data format not matches");
+                        if (!TalendDate.isDate((<%=_sInConnName%>.<%=colName%>).toString(), <%=pattern%>,<%if(ignoreTimeZone){%>true<%}else{%>false<%}%>)) {
+                            throw new IllegalArgumentException("Data format not matches");
+                        }
 <%
-                    } else { //CONDITION_001512 ELSE
+                    } else if (useFasteDateChecker){ //CONDITION_001512 ELSE
 %>
-        java.time.ZoneId zoneId = <%=ignoreTimeZone%> ? java.time.ZoneId.of("UTC") : java.time.ZoneId.systemDefault();
-        String stringDate = (<%=_sInConnName%>.<%=colName%>).toString();
-        if (stringDate == null) {
-            throw new IllegalArgumentException("Data value is null");
-        }
-
-        String pattern = java.util.Optional.ofNullable(<%=pattern%>).orElseGet(() -> "yyyy-MM-dd HH:mm:ss");
-        java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern(pattern);
-        formatter.withZone(zoneId);
-
-        java.time.temporal.TemporalAccessor testDate = null;
-        try {
-            testDate = formatter.parse(stringDate);
-        } catch (java.time.format.DateTimeParseException e) {
-            throw new IllegalArgumentException("Data format not matches");
-        }
-        String formatDate = formatter.format(testDate);
-        ifPassedThrough = formatDate.equalsIgnoreCase(stringDate);
+                        FastDateParser.getInstance(<%=pattern%>, false).parse(<%=_sInConnName%>.<%=colName%>);
 <%
-                    } //CONDITION_001512 STOP
+                    } else {//CONDITION_001512 STOP
+%>
+                        String stringDate = (<%=_sInConnName%>.<%=colName%>).toString();
+                        if (stringDate == null || stringDate.isEmpty()) {
+                            throw new IllegalArgumentException("Data value is null or empty");
+                        }
+                        String pattern = <%=pattern%>;
+                        if (pattern == null || pattern.isEmpty()) {
+                            throw new IllegalArgumentException("Date format is not defined");
+                        }
+                        java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern(pattern);
+                        try {
+                            java.time.temporal.TemporalAccessor testDate = formatter.parse(stringDate);
+                            ifPassedThrough = stringDate.equalsIgnoreCase(formatter.format(testDate));
+                        } catch (java.time.format.DateTimeParseException e) {
+                            throw new IllegalArgumentException("Data format does not match");
+                        }
+<%
+                    }
 %>
         }
     } catch(java.lang.Exception e){

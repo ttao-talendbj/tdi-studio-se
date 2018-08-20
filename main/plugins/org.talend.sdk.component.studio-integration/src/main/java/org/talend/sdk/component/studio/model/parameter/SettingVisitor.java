@@ -53,10 +53,14 @@ import org.talend.sdk.component.studio.Lookups;
 import org.talend.sdk.component.studio.i18n.Messages;
 import org.talend.sdk.component.studio.model.action.Action;
 import org.talend.sdk.component.studio.model.action.SuggestionsAction;
-import org.talend.sdk.component.studio.model.parameter.listener.ActionParametersUpdater;
 import org.talend.sdk.component.studio.model.parameter.listener.ActiveIfListener;
 import org.talend.sdk.component.studio.model.parameter.listener.ValidationListener;
 import org.talend.sdk.component.studio.model.parameter.listener.ValidatorFactory;
+import org.talend.sdk.component.studio.model.parameter.resolver.AbsolutePathResolver;
+import org.talend.sdk.component.studio.model.parameter.resolver.HealthCheckResolver;
+import org.talend.sdk.component.studio.model.parameter.resolver.ParameterResolver;
+import org.talend.sdk.component.studio.model.parameter.resolver.SuggestionsResolver;
+import org.talend.sdk.component.studio.model.parameter.resolver.ValidationResolver;
 import org.talend.sdk.component.studio.util.TaCoKitConst;
 import org.talend.sdk.component.studio.util.TaCoKitUtil;
 
@@ -107,6 +111,8 @@ public class SettingVisitor implements PropertyVisitor {
             new LinkedHashMap<>();
 
     private final List<ParameterResolver> actionResolvers = new ArrayList<>();
+    
+    private final AbsolutePathResolver pathResolver = new AbsolutePathResolver();
 
     public SettingVisitor(final IElement iNode,
             final ElementParameter redrawParameter, final ConfigTypeNode config) {
@@ -157,10 +163,10 @@ public class SettingVisitor implements PropertyVisitor {
 
                         targetParams.forEach((name, p) -> {
                             p.setRedrawParameter(redrawParameter);
-                            p.registerListener(name, activationListener);
+                            p.registerListener("value", activationListener);
                             //Sends initial event to listener to set initial visibility
                             activationListener.propertyChange(
-                                    new PropertyChangeEvent(p, name, p.getValue(), p.getValue()));
+                                    new PropertyChangeEvent(p, "value", p.getValue(), p.getValue()));
                         });
                     });
         });
@@ -326,9 +332,6 @@ public class SettingVisitor implements PropertyVisitor {
         parameter.setListItemsDisplayName(displayNames.toArray(new String[0]));
         parameter.setListItemsDisplayCodeName(codeNames.toArray(new String[0]));
         parameter.setListItemsValue(tableParameters.toArray(new ElementParameter[0]));
-        parameter.setListItemsShowIf(new String[tableParameters.size()]);
-        parameter.setListItemsNotShowIf(new String[tableParameters.size()]);
-
         parameter.updateValueOnly(new ArrayList<Map<String, Object>>());
         // TODO change to real value
         parameter.setBasedOnSchema(false);
@@ -356,8 +359,7 @@ public class SettingVisitor implements PropertyVisitor {
 
     private SuggestionsAction createSuggestionsAction(final PropertyNode node) {
         final SuggestionsAction action = new SuggestionsAction(node.getProperty().getSuggestions().getName(), family);
-        final ActionParametersUpdater updater = new ActionParametersUpdater(action);
-        final SuggestionsResolver resolver = new SuggestionsResolver(node, actions, updater);
+        final SuggestionsResolver resolver = new SuggestionsResolver(action, node, actions);
         actionResolvers.add(resolver);
         return action;
     }
@@ -503,7 +505,7 @@ public class SettingVisitor implements PropertyVisitor {
 
         node.getProperty().getCondition()
                 .forEach(c -> {
-                    c.setTargetPath(AbstractParameterResolver.resolve(node, c.getTarget()));
+                    c.setTargetPath(pathResolver.resolvePath(node.getProperty().getPath(), c.getTarget()));
                     activations.computeIfAbsent(origin.getProperty().getPath(), (key) -> new HashMap<>());
                     activations.get(origin.getProperty().getPath()).computeIfAbsent(level, (k) -> new ArrayList<>());
                     activations.get(origin.getProperty().getPath()).get(level).add(c);
@@ -560,7 +562,7 @@ public class SettingVisitor implements PropertyVisitor {
             final List<PropertyChangeListener> validators = new ValidatorFactory().createValidators(validation, label);
             if (!validators.isEmpty()) {
                 target.setRedrawParameter(redrawParameter);
-                validators.forEach(v -> target.registerListener(target.getName(), v));
+                validators.forEach(v -> target.registerListener("value", v));
             }
         }
     }
@@ -570,6 +572,7 @@ public class SettingVisitor implements PropertyVisitor {
         if (node.getProperty().hasValidation()) {
             final ValidationListener listener =
                     new ValidationListener(label, family, node.getProperty().getValidationName());
+            target.registerListener("value", listener);
             final ValidationResolver resolver = new ValidationResolver(node, actions, listener, redrawParameter);
             actionResolvers.add(resolver);
         }

@@ -296,9 +296,8 @@
 <%
                     if (!useFasteDateChecker && !useStrictDateChecker) { //CONDITION_001512 START
 %>
-                        if (!TalendDate.isDate((<%=_sInConnName%>.<%=colName%>).toString(), <%=pattern%>,<%if(ignoreTimeZone){%>true<%}else{%>false<%}%>)) {
+                        if (!TalendDate.isDate((<%=_sInConnName%>.<%=colName%>).toString(), <%=pattern%>,<%if(ignoreTimeZone){%>true<%}else{%>false<%}%>))
                             throw new IllegalArgumentException("Data format not matches");
-                        }
 <%
                     } else if (useFasteDateChecker){ //CONDITION_001512 ELSE
 %>
@@ -306,21 +305,8 @@
 <%
                     } else {//CONDITION_001512 STOP
 %>
-                        String stringDate = (<%=_sInConnName%>.<%=colName%>).toString();
-                        if (stringDate == null || stringDate.isEmpty()) {
-                            throw new IllegalArgumentException("Data value is null or empty");
-                        }
-                        String pattern = <%=pattern%>;
-                        if (pattern == null || pattern.isEmpty()) {
-                            throw new IllegalArgumentException("Date format is not defined");
-                        }
-                        java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern(pattern);
-                        try {
-                            java.time.temporal.TemporalAccessor testDate = formatter.parse(stringDate);
-                            ifPassedThrough = stringDate.equalsIgnoreCase(formatter.format(testDate));
-                        } catch (java.time.format.DateTimeParseException e) {
-                            throw new IllegalArgumentException("Data format does not match");
-                        }
+                        if(!TalendDate.isDateStrict((<%=_sInConnName%>.<%=colName%>).toString(), <%=pattern%>))
+                            throw new IllegalArgumentException("Data format not matches");
 <%
                     }
 %>

@@ -78,5 +78,13 @@
          </importItemsHandler>
       </importItemsProvider>
    </extension>
+   <extension
+         point="org.talend.core.runtime.itemRelationship">
+      <itemHandler
+            class="org.talend.repository.resource.handler.JobResourceItemRelationshipHandler"
+            id="org.talend.repository.resource.itemHandler.JobResources"
+            name="Job Resources">
+      </itemHandler>
+   </extension>
 
 </plugin>

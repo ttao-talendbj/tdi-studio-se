@@ -34,6 +34,8 @@ public class Action {
 
     public static final String MESSAGE = "comment";
 
+    private V1Action actionClient;
+
     private final String actionName;
 
     private final String family;
@@ -43,7 +45,7 @@ public class Action {
     /**
      * Action parameters map. Key is an ElementParameter path. Value is a list of action parameters associated with the ElementParameter 
      */
-    private final Map<String, List<ActionParameter>> parameters = new HashMap<>();
+    private final Map<String, List<IActionParameter>> parameters = new HashMap<>();
     
     public Action(final String actionName, final String family, final Type type) {
         this.actionName = actionName;
@@ -57,33 +59,19 @@ public class Action {
      * 
      * @param parameter ActionParameter to be added
      */
-    public void addParameter(final ActionParameter parameter) {
+    public void addParameter(final IActionParameter parameter) {
         Objects.requireNonNull(parameter, "parameter should not be null");
         final String elementParameter = parameter.getName();
-        List<ActionParameter> list = parameters.computeIfAbsent(elementParameter, k -> new ArrayList<>());
+        List<IActionParameter> list = parameters.computeIfAbsent(elementParameter, k -> new ArrayList<>());
         if (list.contains(parameter)) {
             throw new IllegalArgumentException("action already contains parameter " + parameter); 
         }
         list.add(parameter);
     }
-    
-    /**
-     * Sets {@code newValue} for all action parameters associated with ElementParameter's {@code parameterName}
-     * 
-     * @param parameterName ElementParameter name
-     * @param newValue new value to be set for action parameters
-     */
-    public void setParameterValue(final String parameterName, final String newValue) {
-        if (!parameters.containsKey(parameterName)) {
-            throw new IllegalArgumentException("Non-existent parameter: " + parameterName);
-        }
-        parameters.get(parameterName).forEach(p -> p.setValue(newValue));
-    }
 
     @SuppressWarnings("unchecked")
     public Map<String, String> callback() {
-        final V1Action action = Lookups.client().v1().action();
-        return action.execute(Map.class, family, type, actionName, payload());
+        return actionClient().execute(Map.class, family, type, actionName, payload());
     }
 
     protected final String getActionName() {
@@ -98,15 +86,14 @@ public class Action {
         return this.type;
     }
     
-    protected final boolean areParametersSet() {
-        return parameters.values().stream().flatMap(List::stream).allMatch(ActionParameter::isHasDirectValue);
-    }
-    
     protected final Map<String, String> payload() {
         final Map<String, String> payload = new HashMap<>();
-        parameters.values().stream().flatMap(List::stream).forEach(actionParameter -> {
-            payload.put(actionParameter.getParameter(), actionParameter.getValue());
-        });
+        parameters.values().stream()
+                .flatMap(List::stream)
+                .flatMap(actionParam -> actionParam.parameters().stream())
+                .forEach(param -> {
+                    payload.put(param.getFirst(), param.getSecond());
+                 });
         return payload;
     }
     
@@ -119,6 +106,13 @@ public class Action {
         public String toString() {
             return super.toString().toLowerCase();
         }
+    }
+
+    protected V1Action actionClient() {
+        if (actionClient == null) {
+            actionClient = Lookups.client().v1().action();
+        }
+        return actionClient;
     }
 
 }

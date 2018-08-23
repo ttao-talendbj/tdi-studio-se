@@ -3095,12 +3095,12 @@
         </projecttask>
         <projecttask
               beforeLogon="false"
-              breaks="6.3.1"
+              breaks="7.1.0"
               class="org.talend.repository.model.migration.spark.UseSqlDateTypeInDataframesTask"
               description="Keep Date type for component impacted by change from Date to Timestamp"
               id="org.talend.repository.model.migration.spark.UseSqlDateTypeInDataframesTask"
               name="UseSqlDateTypeInDataframesTask"
-              version="6.3.2">
+              version="7.1.1">
         </projecttask>
    </extension>
 

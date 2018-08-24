@@ -101,6 +101,7 @@ public class TaCoKitUpdateService implements ITaCoKitUpdateService {
             List<ITaCoKitCarFeature> featureList = new LinkedList<>(features);
             Collections.sort(featureList);
 
+            int succeedNum = 0;
             for (ITaCoKitCarFeature carFeature : featureList) {
                 TaCoKitUtil.checkMonitor(monitor);
                 try {
@@ -115,6 +116,16 @@ public class TaCoKitUpdateService implements ITaCoKitUpdateService {
                         if (carFeature.needRestart()) {
                             result.setNeedRestart(true);
                         }
+                        switch (installStatus.getSeverity()) {
+                        case IStatus.OK:
+                        case IStatus.INFO:
+                        case IStatus.WARNING:
+                            ++succeedNum;
+                            break;
+                        default:
+                            // nothing to do
+                            break;
+                        }
                     }
                 } catch (InterruptedException e) {
                     throw e;
@@ -125,15 +136,17 @@ public class TaCoKitUpdateService implements ITaCoKitUpdateService {
                 monitor.worked(1);
             }
 
-            // if studio need to restart, then no need to reload tacokit
-            if (!result.needRestart()) {
-                try {
-                    String log = ITaCoKitService.getInstance().reload(monitor);
-                    ExceptionHandler.log(log);
-                } catch (InterruptedException e) {
-                    throw e;
-                } catch (Exception e) {
-                    ExceptionHandler.process(e);
+            if (0 < succeedNum) {
+                // if studio need to restart, then no need to reload tacokit
+                if (!result.needRestart()) {
+                    try {
+                        String log = ITaCoKitService.getInstance().reload(monitor);
+                        ExceptionHandler.log(log);
+                    } catch (InterruptedException e) {
+                        throw e;
+                    } catch (Exception e) {
+                        ExceptionHandler.process(e);
+                    }
                 }
             }
         }

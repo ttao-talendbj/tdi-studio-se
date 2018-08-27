@@ -4,7 +4,23 @@
    <extension
          point="org.talend.core.repository.repository_node_provider">
       <repositoryNode
-            folder="route_resources"
+            folder="resources"
+            isAllowMultiName="true"
+            isAllowPlainFolder="true"
+            isResouce="true"
+            key="Resource"
+            label="Resources"
+            name_pattern="\w+([\.-]\w+)*"
+            ordinal="45"
+            products="DI"
+            type="RESOURCES">
+      </repositoryNode>
+   </extension>
+   
+   <extension
+         point="org.talend.core.repository.repository_node_provider">
+      <repositoryNode
+            folder="resources"
             isAllowMultiName="true"
             isAllowPlainFolder="true"
             isResouce="true"
@@ -16,6 +32,27 @@
             type="ROUTE_RESOURCES">
       </repositoryNode>
    </extension>
+   
+   <extension
+         point="org.talend.repository.items.importexport.handler">
+      <importItemsProvider
+            id="org.talend.repository.resource.handler.ResourceImportHandler"
+            name="Resources importer"
+            priority="NORMAL">
+         <importItemsHandler
+               class="org.talend.repository.resource.handler.RouteResourceImportHandler">
+            <parameter
+                  name="type"
+                  value="RESOURCES">
+            </parameter>
+         </importItemsHandler>
+      </importItemsProvider>
+   </extension>
+   
+       <extension point="org.talend.core.repository.repository_content">
+        <RepositoryContent class="org.talend.repository.resource.handler.ResourcesRepositoryContentHandler" />
+    </extension>
+
    <extension
          point="org.talend.core.repositoryContextualsActions">
       <Action

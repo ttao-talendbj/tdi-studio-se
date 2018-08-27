@@ -9,7 +9,6 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.ide.IDE;
-import org.talend.camel.core.model.camelProperties.RouteResourceItem;
 import org.talend.commons.exception.ExceptionHandler;
 import org.talend.commons.exception.PersistenceException;
 import org.talend.commons.runtime.model.repository.ERepositoryStatus;
@@ -18,6 +17,7 @@ import org.talend.commons.utils.VersionUtils;
 import org.talend.core.model.properties.Item;
 import org.talend.core.model.properties.Property;
 import org.talend.core.model.repository.IRepositoryViewObject;
+import org.talend.core.model.resources.ResourceItem;
 import org.talend.core.repository.model.ProxyRepositoryFactory;
 import org.talend.core.runtime.CoreRuntimePlugin;
 import org.talend.designer.core.DesignerPlugin;
@@ -76,7 +76,7 @@ public class RouteResourceEditorUtil {
 	 * @param item
 	 */
 	public static void openDefaultEditor(final IWorkbenchPage page,
-			IRepositoryNode node, RouteResourceItem item) {
+            IRepositoryNode node, ResourceItem item) {
 		RouteResourceInput fileEditorInput = RouteResourceInput
 				.createInput(node, item);
 
@@ -91,7 +91,7 @@ public class RouteResourceEditorUtil {
 	 * @param item
 	 */
 	public static void openEditor(final IWorkbenchPage page,
-			IRepositoryNode node, RouteResourceItem item) {
+            IRepositoryNode node, ResourceItem item) {
 		RouteResourceInput fileEditorInput = RouteResourceInput
 				.createInput(node, item);
 		if(fileEditorInput.isReadOnly()){
@@ -110,7 +110,7 @@ public class RouteResourceEditorUtil {
 	 * @param item
 	 */
 	public static void openEditor(final IWorkbenchPage page,
-			RouteResourceInput fileEditorInput, RouteResourceItem item,
+            RouteResourceInput fileEditorInput, ResourceItem item,
 			String editorId) {
 		try {
 			IEditorPart editorPart = page.findEditor(fileEditorInput);

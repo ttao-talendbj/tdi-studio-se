@@ -8,8 +8,8 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
-import org.talend.camel.core.model.camelProperties.RouteResourceItem;
 import org.talend.core.model.general.Project;
+import org.talend.core.model.resources.ResourceItem;
 import org.talend.repository.ProjectManager;
 
 public class JobResourceUtil {
@@ -20,7 +20,7 @@ public class JobResourceUtil {
      * @param item
      * @return
      */
-    public static IFile getSourceFile(RouteResourceItem item) {
+    public static IFile getSourceFile(ResourceItem item) {
         // the file may come from a reference project
         IFolder rrfolder = null;
         Resource eResource = item.eResource();
@@ -41,7 +41,7 @@ public class JobResourceUtil {
 
             IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(technicalLabel);
             String folderPath = item.getState().getPath();
-            rrfolder = project.getFolder(RouteResourceItem.ROUTE_RESOURCES_FOLDER);
+            rrfolder = project.getFolder("resources");
             if (folderPath != null && !folderPath.isEmpty()) {
                 rrfolder = rrfolder.getFolder(folderPath);
             }

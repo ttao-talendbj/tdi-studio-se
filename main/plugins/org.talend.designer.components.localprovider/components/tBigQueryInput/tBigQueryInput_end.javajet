@@ -21,12 +21,12 @@ imports="
 	}
 	bigQueryUtil_<%=cid%>.cleanup();
   	<%
-  	} else if (authMode.equals("Service account")) {
+  	} else if (authMode.equals("SERVICEACCOUNT")) {
   	%>
   		}
   	<%
   	} else {
-		throw new IllegalArgumentException("authentication mode " + authMode + " does not exist, it should be either \"Service account\" or \"OAuth 2.0\"");
+		throw new IllegalArgumentException("authentication mode should be either \"SERVICEACCOUNT\" or \"OAUTH\", but it is " + authMode);
   	}
 	log4jFileUtil.retrievedDataNumberInfo(node);
 	%>

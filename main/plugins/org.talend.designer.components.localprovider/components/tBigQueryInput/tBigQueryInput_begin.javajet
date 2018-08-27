@@ -32,7 +32,7 @@
 	
     String tokenFile = ElementParameterParser.getValue(node,"__TOKEN_NAME__");
     boolean isLog4jEnabled = ("true").equals(ElementParameterParser.getValue(node.getProcess(), "__LOG4J_ACTIVATE__"));
-    if (authMode.equals("OAuth 2.0")) {
+    if (authMode.equals("OAUTH")) {
 		%>
 		final String CLIENT_ID_<%=cid %> = <%=clientId %>;
 		<%
@@ -211,7 +211,7 @@
 		%>
 		String pageToken_<%=cid%> = null;
 	<%
-	} else if (authMode.equals("Service account")) {
+	} else if (authMode.equals("SERVICEACCOUNT")) {
 	%>
 		com.google.auth.oauth2.GoogleCredentials credentials_<%=cid%>;
 		java.io.File credentialsFile_<%=cid%> = new java.io.File(<%=credentialsFile%>);
@@ -257,11 +257,11 @@
 		long nb_line_<%=cid%> = 0;
 	<%
 	} else {
-		throw new IllegalArgumentException("authentication mode " + authMode + " does not exist, it should be either \"Service account\" or \"OAuth 2.0\"");
+		throw new IllegalArgumentException("authentication mode should be either \"SERVICEACCOUNT\" or \"OAUTH\", but it is " + authMode);
 	}
 	
 	
-	if (authMode.equals("OAuth 2.0")) {
+	if (authMode.equals("OAUTH")) {
 	%>
 	while (true) {
 		// Fetch Results
@@ -285,14 +285,14 @@
 			Object value_<%=cid%> = null;
 			nb_line_<%=cid%> ++;
 		<%
-	} else if (authMode.equals("Service account")) {
+	} else if (authMode.equals("SERVICEACCOUNT")) {
 	%>
 		for (com.google.cloud.bigquery.FieldValueList field_<%=cid %> : result_<%=cid%>.iterateAll()) {
 			Object value_<%=cid%>;
 			nb_line_<%=cid%> ++;
 	<%
 	} else {
-		throw new IllegalArgumentException("authentication mode " + authMode + " does not exist, it should be either \"Service account\" or \"OAuth 2.0\"");
+		throw new IllegalArgumentException("authentication mode should be either \"SERVICEACCOUNT\" or \"OAUTH\", but it is " + authMode);
 	}
 		List< ? extends IConnection> conns = node.getOutgoingSortedConnections();
 		if (conns != null){
@@ -319,16 +319,16 @@
 								String typeToGenerate = JavaTypesManager.getTypeToGenerate(column.getTalendType(), column.isNullable());
 								JavaType javaType = JavaTypesManager.getJavaTypeFromId(column.getTalendType());
 								String patternValue = column.getPattern() == null || column.getPattern().trim().length() == 0 ? null : column.getPattern(); 
-								if (authMode.equals("OAuth 2.0")) {
+								if (authMode.equals("OAUTH")) {
 								%>
 								value_<%=cid%> = field_<%=cid %>.get(<%=i%>).getV();
 								<%
-								} else if (authMode.equals("Service account")) {
+								} else if (authMode.equals("SERVICEACCOUNT")) {
 								%>
 								value_<%=cid%> = field_<%=cid %>.get(<%=i%>).getValue();
 								<%
 								} else {
-									throw new IllegalArgumentException("authentication mode " + authMode + " does not exist, it should be either \"Service account\" or \"OAuth 2.0\"");
+									throw new IllegalArgumentException("authentication mode should be either \"SERVICEACCOUNT\" or \"OAUTH\", but it is " + authMode);
 								}
 								%>
 								if(com.google.api.client.util.Data.isNull(value_<%=cid%>)) value_<%=cid%> = null;

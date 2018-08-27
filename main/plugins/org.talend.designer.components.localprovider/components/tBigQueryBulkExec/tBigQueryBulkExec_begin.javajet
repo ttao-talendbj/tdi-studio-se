@@ -34,7 +34,7 @@
 	
 	String passwordFieldName = "";
 	
-    if (authMode.equals("OAuth 2.0")) {
+    if (authMode.equals("OAUTH")) {
 		%>
 		/* ----START-CREATING-CLIENT (OAuth 2.0)---- */
 
@@ -178,7 +178,7 @@
 		/* ----END-CREATING-CLIENT (OAuth 2.0)---- */
 	
 	<%
-	} else if (authMode.equals("Service account")) {
+	} else if (authMode.equals("SERVICEACCOUNT")) {
 	%>
 		/* ----START-CREATING-CLIENT (Cloud API)---- */
 
@@ -199,7 +199,7 @@
 		long nb_line_<%=cid%> = 0;
 	<%
 	} else {
-		throw new IllegalArgumentException("authentication mode " + authMode + " does not exist, it should be either \"Service account\" or \"OAuth 2.0\"");
+		throw new IllegalArgumentException("authentication mode should be either \"SERVICEACCOUNT\" or \"OAUTH\", but it is " + authMode);
 	}
 	boolean bulkFileAlreadyExists = "true".equals(ElementParameterParser.getValue(node, "__BULK_FILE_ALREADY_EXIST__"));
 	String accessKey = ElementParameterParser.getValue(node, "__GS_ACCESS_KEY__");
@@ -245,7 +245,7 @@
 	/* ----END-UPLOADING-FILE---- */
 
 	<%
-    if (authMode.equals("OAuth 2.0")) {
+    if (authMode.equals("OAUTH")) {
 		if(isLog4jEnabled){
 		%>
 			log.info("<%=cid%> - Starting build a job.");
@@ -435,7 +435,7 @@
 		}
 		/* ----END-CREATING-JOB (OAuth 2.0)---- */
 	<%
-	} else if (authMode.equals("Service account")) {
+	} else if (authMode.equals("SERVICEACCOUNT")) {
 	%>
 		/* ----START-CREATING-JOB (Cloud API)---- */
 		com.google.cloud.bigquery.TableId tableId_<%=cid%> = com.google.cloud.bigquery.TableId.of(<%=projectId%>, <%=dataset%>, <%=table%>);
@@ -500,6 +500,6 @@
 		/* ----END-CREATING-JOB (Cloud API)---- */
 	<%
 	} else {
-		throw new IllegalArgumentException("authentication mode " + authMode + " does not exist, it should be either \"Service account\" or \"OAuth 2.0\"");
+		throw new IllegalArgumentException("authentication mode should be either \"SERVICEACCOUNT\" or \"OAUTH\", but it is " + authMode);
 	}
 	%>

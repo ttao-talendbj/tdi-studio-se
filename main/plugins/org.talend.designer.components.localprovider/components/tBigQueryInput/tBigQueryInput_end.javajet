@@ -11,7 +11,7 @@ imports="
     INode node = (INode)codeGenArgument.getArgument();
     String cid = node.getUniqueName();
 	String authMode = ElementParameterParser.getValue(node,"__AUTH_MODE__");
-	if (authMode.equals("OAuth 2.0")) {
+	if (authMode.equals("OAUTH")) {
 	%>
 			}
 		pageToken_<%=cid%> = dataList_<%=cid %>.getPageToken();

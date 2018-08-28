@@ -440,11 +440,22 @@
 		/* ----START-CREATING-JOB (Cloud API)---- */
 		com.google.cloud.bigquery.TableId tableId_<%=cid%> = com.google.cloud.bigquery.TableId.of(<%=projectId%>, <%=dataset%>, <%=table%>);
 		com.google.cloud.bigquery.Table table_<%=cid%> = bigquery_<%=cid%>.getTable(tableId_<%=cid%>);
-		boolean tableNotExist = table_<%=cid%> == null;
-		if (tableNotExist) {
-			if (!<%=ElementParameterParser.getBooleanValue(node, "__CREATE_TABLE_IF_NOT_EXIST__")%>) {
-				throw new RuntimeException("table [" + <%=dataset%> + "." + <%=table%> + "] does not exist");
+		if (<%=ElementParameterParser.getBooleanValue(node, "__DROP__")%> && table_<%=cid%> != null) {
+			boolean deleted = bigquery_<%=cid%>.delete(tableId_<%=cid%>);	
+			if (deleted) {
+				<%
+				if(isLog4jEnabled){
+				%>
+					log.info("<%=cid%> - table " + tableId_<%=cid%> + " deleted");
+				<%
+				}
+				%>
+			} else {
+				throw new RuntimeException("Unable to delete table " + tableId_<%=cid%>);
 			}
+		}
+		boolean tableNotExist = table_<%=cid%> == null;
+		if (<%=ElementParameterParser.getBooleanValue(node, "__DROP__")%> || tableNotExist) {
 			java.util.List<com.google.cloud.bigquery.Field> fields_<%=cid%> = new java.util.ArrayList<>();
 			<%
 			List<IMetadataTable> metadatas = node.getMetadataList();

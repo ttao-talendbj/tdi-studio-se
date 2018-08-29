@@ -239,8 +239,8 @@
             />
             <IMPORT
                 NAME="WOODSTOX-CORE"
-                MODULE="woodstox-core-5.0.3.jar"
-                MVN="mvn:com.fasterxml.woodstox/woodstox-core/5.0.3"
+                MODULE="woodstox-core-5.1.0.jar"
+                MVN="mvn:com.fasterxml.woodstox/woodstox-core/5.1.0"
                 REQUIRED="true"
             />
             <IMPORT

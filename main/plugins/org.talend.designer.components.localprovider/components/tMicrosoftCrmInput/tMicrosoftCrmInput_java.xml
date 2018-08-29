@@ -19608,9 +19608,9 @@
                     UrlPath="platform:/plugin/org.talend.libraries.apache.cxf/lib/stax2-api-3.1.4.jar"
                     REQUIRED_IF="(AUTH_TYPE == 'ON_PREMISE') AND (MS_CRM_VERSION == 'CRM_2015')" />
                 <IMPORT
-                    NAME="woodstox-core-5.0.3.jar"
-                    MODULE="woodstox-core-5.0.3.jar"
-                    MVN="mvn:com.fasterxml.woodstox/woodstox-core/5.0.3"
+                    NAME="woodstox-core-5.1.0.jar"
+                    MODULE="woodstox-core-5.1.0.jar"
+                    MVN="mvn:com.fasterxml.woodstox/woodstox-core/5.1.0"
                     REQUIRED_IF="(AUTH_TYPE == 'ON_PREMISE') AND (MS_CRM_VERSION == 'CRM_2015')" />
                 <IMPORT
                     NAME="wsdl4j-1.6.3"

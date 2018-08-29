@@ -456,6 +456,7 @@
 		}
 		boolean tableNotExist = table_<%=cid%> == null;
 		if (<%=ElementParameterParser.getBooleanValue(node, "__DROP__")%> || tableNotExist) {
+			boolean typeSupported = true;
 			java.util.List<com.google.cloud.bigquery.Field> fields_<%=cid%> = new java.util.ArrayList<>();
 			<%
 			List<IMetadataTable> metadatas = node.getMetadataList();
@@ -467,17 +468,26 @@
 					for (int i = 0; i < nbColumns; i++ ) {
 						IMetadataColumn column = columns.get(i);
 						String columnName = column.getLabel();
-						String typeToGenerate = "com.google.cloud.bigquery.LegacySQLTypeName.STRING";
-						if("id_Float".equals(column.getTalendType())) {
+						String typeToGenerate = null;
+						if("id_String".equals(column.getTalendType())) {
+							typeToGenerate = "com.google.cloud.bigquery.LegacySQLTypeName.STRING";
+						} else if ("id_Float".equals(column.getTalendType()) || "id_Double".equals(column.getTalendType())) {
 							typeToGenerate = "com.google.cloud.bigquery.LegacySQLTypeName.FLOAT";
-						} else if("id_Integer".equals(column.getTalendType())) {
+						} else if ("id_Short".equals(column.getTalendType()) || "id_Integer".equals(column.getTalendType()) || "id_Long".equals(column.getTalendType())) {
 							typeToGenerate = "com.google.cloud.bigquery.LegacySQLTypeName.INTEGER";
-						} else if("id_Boolean".equals(column.getTalendType())) {
+						} else if ("id_Boolean".equals(column.getTalendType())) {
 							typeToGenerate = "com.google.cloud.bigquery.LegacySQLTypeName.BOOLEAN";
-						} else if("id_Date".equals(column.getTalendType())) {
+						} else if ("id_Date".equals(column.getTalendType())) {
 							typeToGenerate = "com.google.cloud.bigquery.LegacySQLTypeName.TIMESTAMP";
+						} else {
+						%>
+							typeSupported = false;
+						<%
 						}
 						%>
+						if (!typeSupported) {
+							throw new IllegalArgumentException("unsupported type for column [<%=columnName%>]: " + "<%=column.getTalendType()%>");
+						}
 						com.google.cloud.bigquery.Field field_<%=i%> = com.google.cloud.bigquery.Field.of("<%=columnName%>", <%=typeToGenerate%>);
 						fields_<%=cid%>.add(field_<%=i%>);		
 						<%

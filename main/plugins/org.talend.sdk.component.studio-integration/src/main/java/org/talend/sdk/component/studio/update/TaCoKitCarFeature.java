@@ -23,6 +23,7 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.URIUtil;
@@ -33,19 +34,36 @@ import org.talend.sdk.component.studio.i18n.Messages;
 import org.talend.sdk.component.studio.util.TaCoKitConst;
 import org.talend.sdk.component.studio.util.TaCoKitUtil;
 import org.talend.sdk.component.studio.util.TaCoKitUtil.GAV;
-import org.talend.updates.runtime.model.ITaCoKitCarFeature;
+import org.talend.updates.runtime.feature.model.Category;
+import org.talend.updates.runtime.feature.model.Type;
+import org.talend.updates.runtime.model.AbstractExtraFeature;
 import org.talend.updates.runtime.model.UpdateSiteLocationType;
+import org.talend.updates.runtime.model.interfaces.ITaCoKitCarFeature;
+import org.talend.updates.runtime.nexus.component.ComponentIndexBean;
+import org.talend.updates.runtime.utils.PathUtils;
 
 /**
  * DOC cmeng  class global comment. Detailled comment
  */
-public class TaCoKitCarFeature implements ITaCoKitCarFeature {
+public class TaCoKitCarFeature extends AbstractExtraFeature implements ITaCoKitCarFeature {
 
     private boolean autoReloadAfterInstalled = true;
 
     private TaCoKitCar car;
 
+    private Object carLock = new Object();
+
+    public TaCoKitCarFeature(ComponentIndexBean indexBean) {
+        super(indexBean.getBundleId(), indexBean.getName(), indexBean.getVersion(), indexBean.getDescription(),
+                indexBean.getMvnURI(), indexBean.getImageMvnURI(), indexBean.getProduct(), indexBean.getCompatibleStudioVersion(),
+                null, PathUtils.convert2Types(indexBean.getTypes()), PathUtils.convert2Categories(indexBean.getCategories()),
+                Boolean.valueOf(indexBean.getDegradable()), false, false);
+    }
+
     public TaCoKitCarFeature(TaCoKitCar car) throws Exception {
+        super(car.toString(), car.getName(), car.getCarVersion(), car.getDescription(), null, null, null, null, null,
+                PathUtils.convert2Types(Type.TCOMP.getKeyWord() + "," + Type.TCOMP_V1.getKeyWord()),
+                PathUtils.convert2Categories(Category.ALL.getKeyWord()), false, false, false);
         this.car = car;
     }
 
@@ -55,7 +73,7 @@ public class TaCoKitCarFeature implements ITaCoKitCarFeature {
         List<GAV> installedComponents = TaCoKitUtil.getInstalledComponents(progress);
         if (installedComponents != null && !installedComponents.isEmpty()) {
             TaCoKitUtil.checkMonitor(progress);
-            List<GAV> newComponents = getCar().getComponents();
+            List<GAV> newComponents = getCar(progress).getComponents();
             if (newComponents != null) {
                 Map<GAV, GAV> alreadyInstalledComponentMap = filterAlreadyInstalledComponent(installedComponents, newComponents,
                         progress);
@@ -188,7 +206,7 @@ public class TaCoKitCarFeature implements ITaCoKitCarFeature {
 
     @SuppressWarnings("nls")
     public boolean install(IProgressMonitor progress) throws Exception {
-        TaCoKitCar tckCar = getCar();
+        TaCoKitCar tckCar = getCar(progress);
         String[] carCmd = new String[] {
                 new File(System.getProperty("java.home"),
                         "bin/java" + (System.getProperty("os.name").toLowerCase(Locale.ROOT).contains("win") ? ".exe" : ""))
@@ -206,10 +224,19 @@ public class TaCoKitCarFeature implements ITaCoKitCarFeature {
 
     @Override
     public int compareTo(Object o) {
-        TaCoKitCar sTckCar = getCar();
+        TaCoKitCar sTckCar = null;
+        try {
+            sTckCar = getCar(new NullProgressMonitor());
+        } catch (Exception e) {
+            ExceptionHandler.process(e);
+        }
         TaCoKitCar oTckCar = null;
         if (o instanceof TaCoKitCarFeature) {
-            oTckCar = ((TaCoKitCarFeature) o).getCar();
+            try {
+                oTckCar = ((TaCoKitCarFeature) o).getCar(new NullProgressMonitor());
+            } catch (Exception e) {
+                ExceptionHandler.process(e);
+            }
         } else if (o instanceof TaCoKitCar) {
             oTckCar = (TaCoKitCar) o;
         } else {
@@ -255,17 +282,47 @@ public class TaCoKitCarFeature implements ITaCoKitCarFeature {
 
     @Override
     public String getName() {
-        return getCar().getName();
+        String name = super.getName();
+        if (StringUtils.isBlank(name)) {
+            try {
+                return getCar(new NullProgressMonitor()).getName();
+            } catch (Exception e) {
+                ExceptionHandler.process(e);
+            }
+            return null;
+        } else {
+            return name;
+        }
     }
 
     @Override
     public String getDescription() {
-        return getCar().getDescription();
+        String description = super.getDescription();
+        if (StringUtils.isBlank(description)) {
+            try {
+                return getCar(new NullProgressMonitor()).getDescription();
+            } catch (Exception e) {
+                ExceptionHandler.process(e);
+            }
+            return null;
+        } else {
+            return description;
+        }
     }
 
     @Override
     public String getVersion() {
-        return getCar().getCarVersion();
+        String version = super.getVersion();
+        if (StringUtils.isBlank(version)) {
+            try {
+                return getCar(new NullProgressMonitor()).getCarVersion();
+            } catch (Exception e) {
+                ExceptionHandler.process(e);
+            }
+            return null;
+        } else {
+            return version;
+        }
     }
 
     @Override
@@ -279,11 +336,17 @@ public class TaCoKitCarFeature implements ITaCoKitCarFeature {
     }
 
     @Override
-    public File getCarFile() {
-        return getCar().getCarFile();
+    public File getCarFile(IProgressMonitor progress) throws Exception {
+        return getCar(new NullProgressMonitor()).getCarFile();
     }
 
-    private TaCoKitCar getCar() {
+    private TaCoKitCar getCar(IProgressMonitor progress) throws Exception {
+        if (this.car != null) {
+            return this.car;
+        }
+        synchronized (carLock) {
+            this.car = new TaCoKitCar(getStorage().getFeatureFile(progress));
+        }
         return this.car;
     }
 

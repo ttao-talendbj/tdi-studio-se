@@ -30,7 +30,8 @@ import org.talend.sdk.component.studio.i18n.Messages;
 import org.talend.sdk.component.studio.update.TaCoKitCar;
 import org.talend.sdk.component.studio.update.TaCoKitCarFeature;
 import org.talend.sdk.component.studio.util.TaCoKitUtil;
-import org.talend.updates.runtime.model.ITaCoKitCarFeature;
+import org.talend.updates.runtime.model.interfaces.ITaCoKitCarFeature;
+import org.talend.updates.runtime.nexus.component.ComponentIndexBean;
 import org.talend.updates.runtime.service.ITaCoKitUpdateService;
 
 
@@ -43,6 +44,11 @@ public class TaCoKitUpdateService implements ITaCoKitUpdateService {
     public ITaCoKitCarFeature generateExtraFeature(File file, IProgressMonitor monitor) throws Exception {
         TaCoKitCar car = new TaCoKitCar(file);
         return new TaCoKitCarFeature(car);
+    }
+
+    @Override
+    public ITaCoKitCarFeature generateExtraFeature(ComponentIndexBean indexBean, IProgressMonitor monitor) throws Exception {
+        return new TaCoKitCarFeature(indexBean);
     }
 
     @Override
@@ -112,7 +118,7 @@ public class TaCoKitUpdateService implements ITaCoKitUpdateService {
                                 carFeature.getName()));
                         carFeature.setAutoReloadAfterInstalled(false);
                         IStatus installStatus = carFeature.install(monitor, Collections.EMPTY_LIST);
-                        result.getInstalledStatus().put(carFeature.getCarFile(), installStatus);
+                        result.getInstalledStatus().put(carFeature.getCarFile(monitor), installStatus);
                         if (carFeature.needRestart()) {
                             result.setNeedRestart(true);
                         }
@@ -131,7 +137,7 @@ public class TaCoKitUpdateService implements ITaCoKitUpdateService {
                     throw e;
                 } catch (Exception e) {
                     ExceptionHandler.process(e);
-                    result.getFailedFile().add(carFeature.getCarFile());
+                    result.getFailedFile().add(carFeature.getCarFile(monitor));
                 }
                 monitor.worked(1);
             }

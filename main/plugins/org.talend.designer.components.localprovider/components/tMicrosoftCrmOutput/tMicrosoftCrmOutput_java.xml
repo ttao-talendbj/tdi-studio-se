@@ -29020,10 +29020,9 @@
                 UrlPath="platform:/plugin/org.talend.libraries.apache.cxf/lib/slf4j-jdk14-1.7.12.jar"
                 REQUIRED_IF="(AUTH_TYPE == 'ON_PREMISE') AND (MS_CRM_VERSION == 'CRM_2015')" />
             <IMPORT
-                NAME="stax2-api-3.1.4"
-                MODULE="stax2-api-3.1.4.jar"
-                MVN="mvn:org.talend.libraries/stax2-api-3.1.4/6.0.0"
-                UrlPath="platform:/plugin/org.talend.libraries.apache.cxf/lib/stax2-api-3.1.4.jar"
+                NAME="stax2-api-4.1"
+                MODULE="stax2-api-4.1.jar"
+                MVN="mvn:org.codehaus.woodstox/stax2-api/4.1"
                 REQUIRED_IF="(AUTH_TYPE == 'ON_PREMISE') AND (MS_CRM_VERSION == 'CRM_2015')" />
             <IMPORT
                 NAME="woodstox-core-5.1.0.jar"

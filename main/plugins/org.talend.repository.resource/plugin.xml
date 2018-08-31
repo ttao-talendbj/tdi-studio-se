@@ -86,5 +86,12 @@
             name="Job Resources">
       </itemHandler>
    </extension>
+   <extension
+         point="org.talend.core.repository.checkDeleteItemReference">
+      <check
+            class="org.talend.repository.resource.delete.CheckJobResourceDeleteReference"
+            priority="normal">
+      </check>
+   </extension>
 
 </plugin>

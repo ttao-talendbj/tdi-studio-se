@@ -65,7 +65,10 @@ public class ResourceDependenciesUtil {
                 if (parts.length == 2 || parts.length > 2) {
                     JobResourceDependencyModel model = createDependency(parts[0], parts[1], parts.length > 2 ? parts[2] : null,
                             jobLabel);
-                    models.add(model);
+                    // if the Resource item was force deleted, model would be null
+                    if (model != null) {
+                        models.add(model);
+                    }
                 }
             }
 

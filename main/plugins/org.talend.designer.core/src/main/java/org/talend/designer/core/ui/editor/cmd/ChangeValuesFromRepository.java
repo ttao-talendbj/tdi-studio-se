@@ -326,6 +326,10 @@ public class ChangeValuesFromRepository extends ChangeMetadataCommand {
                 }
             }
             Map<Object, Object> contextMap = new HashMap<Object, Object>();
+            if (elem instanceof INode) {
+                contextMap.put("NODE", (INode) elem);
+            }
+            
             for (IElementParameter param : elementParameters) {
                 String repositoryValue = param.getRepositoryValue();
                 if (param.getFieldType() == EParameterFieldType.PROPERTY_TYPE) {

@@ -17,6 +17,10 @@ import org.talend.core.repository.model.ProjectRepositoryNode;
 import org.talend.repository.model.RepositoryNode;
 import org.talend.repository.viewer.content.ProjectRepoDirectChildrenNodeContentProvider;
 
+/**
+ * 
+ * DOC jding class global comment. Detailled comment
+ */
 public class ResourcesContentProvider extends ProjectRepoDirectChildrenNodeContentProvider {
 
     /*

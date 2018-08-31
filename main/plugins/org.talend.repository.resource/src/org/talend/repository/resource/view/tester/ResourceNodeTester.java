@@ -18,6 +18,10 @@ import java.util.Map;
 import org.talend.core.model.repository.ERepositoryObjectType;
 import org.talend.repository.tester.AbstractNodeTypeTester;
 
+/**
+ * 
+ * DOC jding class global comment. Detailled comment
+ */
 public class ResourceNodeTester extends AbstractNodeTypeTester {
 
     @SuppressWarnings("serial")

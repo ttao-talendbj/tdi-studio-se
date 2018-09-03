@@ -563,8 +563,12 @@ public class TalendJavaProjectManager {
                     repoObject = ProxyRepositoryFactory.getInstance().getSpecificVersion(parts[0], parts[1], true);
                 }
                 if (repoObject != null) {
-                    ResourceDependenciesUtil.copyToExtResourceFolder(repoObject,
-                            property.getLabel() + "_" + property.getVersion(), parts[1]);
+                    StringBuffer joblabel = new StringBuffer();
+                    if (StringUtils.isNotBlank(property.getItem().getState().getPath())) {
+                        joblabel.append(property.getItem().getState().getPath() + "/");
+                    }
+                    joblabel.append(property.getLabel() + "_" + property.getVersion());
+                    ResourceDependenciesUtil.copyToExtResourceFolder(repoObject, joblabel.toString(), parts[1]);
                 }
             }
         }

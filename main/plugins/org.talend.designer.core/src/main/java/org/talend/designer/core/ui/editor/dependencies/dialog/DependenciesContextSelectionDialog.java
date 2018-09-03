@@ -28,6 +28,7 @@ import org.talend.core.ui.context.model.table.ContextTableTabChildModel;
 import org.talend.core.ui.context.model.table.ContextTableTabParentModel;
 import org.talend.designer.core.i18n.Messages;
 import org.talend.designer.core.ui.editor.dependencies.model.JobContextTreeNode;
+import org.talend.designer.core.ui.editor.dependencies.model.JobResourceDependencyModel;
 import org.talend.designer.core.ui.editor.dependencies.provider.JobContextViewerProvider;
 import org.talend.designer.core.ui.editor.dependencies.util.ResourceContextHelper;
 import org.talend.repository.viewer.ui.viewer.RepositoryTreeViewer;
@@ -50,10 +51,14 @@ public class DependenciesContextSelectionDialog extends Dialog {
 
     private CommandStack commandStack;
 
-    public DependenciesContextSelectionDialog(final Shell parentShell, IProcess2 process, CommandStack commandStack) {
+    private JobResourceDependencyModel model;
+
+    public DependenciesContextSelectionDialog(final Shell parentShell, IProcess2 process, CommandStack commandStack,
+            JobResourceDependencyModel model) {
         super(parentShell);
         this.process = process;
         this.commandStack = commandStack;
+        this.model = model;
     }
 
     protected void configureShell(Shell shell) {
@@ -85,7 +90,8 @@ public class DependenciesContextSelectionDialog extends Dialog {
                     } else {
                         sourceId = ((ContextTableTabChildModel) node.getTreeData()).getSourceId();
                     }
-                    boolean checkIfContextVarIsInUse = contextHelper.checkIfContextVarIsInUse(node.getName(), sourceId);
+                    boolean checkIfContextVarIsInUse = contextHelper.checkIfContextVarIsInUse(node.getName(), sourceId,
+                            model.getPathUrl());
                     if (checkIfContextVarIsInUse) {
                         setMessageVisible(true);
                     }

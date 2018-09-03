@@ -133,10 +133,11 @@ public class JobResourceDependencyModel {
 
 
     /**
-     * @return the classPathUrl
+     * @return the classPathUrl without version
      */
     public String getPathUrl() {
-        return JavaResourcesHelper.getResouceClasspath(item, selectedVersion);
+        // will always be resouceClasspath + fileName (test.txt) not include version
+        return JavaResourcesHelper.getResouceClasspath(item, RelationshipItemBuilder.LATEST_VERSION);
     }
 
     /**

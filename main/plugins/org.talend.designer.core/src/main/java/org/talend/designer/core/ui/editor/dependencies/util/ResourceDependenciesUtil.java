@@ -20,6 +20,7 @@ import org.talend.core.model.process.IContext;
 import org.talend.core.model.process.IContextParameter;
 import org.talend.core.model.process.IProcess2;
 import org.talend.core.model.properties.Item;
+import org.talend.core.model.properties.Property;
 import org.talend.core.model.repository.IRepositoryViewObject;
 import org.talend.core.repository.model.ProxyRepositoryFactory;
 import org.talend.designer.core.ui.editor.dependencies.model.JobResourceDependencyModel;
@@ -48,13 +49,23 @@ public class ResourceDependenciesUtil {
     private static final String SRC_EXTRESOURCE_FOLDER = "/src/main/ext-resources";
 
     public static Collection<JobResourceDependencyModel> getResourceDependencies(Item item) {
+        StringBuffer joblabel = new StringBuffer();
+        if (StringUtils.isNotBlank(item.getState().getPath())) {
+            joblabel.append(item.getState().getPath() + "/");
+        }
+        joblabel.append(item.getProperty().getLabel() + "_" + item.getProperty().getVersion());
         return getResourceDependencies((String) item.getProperty().getAdditionalProperties().get(RESOURCES_PROP),
-                item.getProperty().getLabel() + "_" + item.getProperty().getVersion());
+                joblabel.toString());
     }
 
     public static Collection<JobResourceDependencyModel> getResourceDependencies(IProcess2 process) {
-        return getResourceDependencies((String) process.getAdditionalProperties().get(RESOURCES_PROP),
-                process.getProperty().getLabel() + "_" + process.getProperty().getVersion());
+        Property property = process.getProperty();
+        StringBuffer joblabel = new StringBuffer();
+        if (StringUtils.isNotBlank(property.getItem().getState().getPath())) {
+            joblabel.append(property.getItem().getState().getPath() + "/");
+        }
+        joblabel.append(property.getLabel() + "_" + property.getVersion());
+        return getResourceDependencies((String) process.getAdditionalProperties().get(RESOURCES_PROP), joblabel.toString());
     }
 
     private static Collection<JobResourceDependencyModel> getResourceDependencies(String resource, String jobLabel) {
@@ -137,7 +148,7 @@ public class ResourceDependenciesUtil {
                             item.getContextVar());
                     if (contextPar != null) {
                         contextPar.setType(JavaTypesManager.RESOURCE.getId());
-                        contextPar.setValue(item.getResourceDepPath());
+                        contextPar.setValue(item.getPathUrl());
                     }
                 }
             }
@@ -149,7 +160,8 @@ public class ResourceDependenciesUtil {
         for (IContext context : listContext) {
             for (IContextParameter contextPar : context.getContextParameterList()) {
                 if (contextPar.getType().equals(JavaTypesManager.RESOURCE.getId())
-                        && StringUtils.isNotBlank(contextPar.getValue())) {
+                        && StringUtils.isNotBlank(contextPar.getValue())
+                        && IContextParameter.BUILT_IN.equals(contextPar.getSource())) {
                     contextPar.setType(ContextParameterJavaTypeManager.getDefaultJavaType().getId());
                     contextPar.setValue("");
                 }

@@ -139,7 +139,7 @@ for (final String fieldString : referenceProperties) {
 }
 %>
 globalMap.put("<%=cid %>_COMPONENT_RUNTIME_PROPERTIES", props_<%=cid %>);
-
+globalMap.put("<%=cid %>_TALEND_PRODUCT_VERSION, <%=org.talend.core.utils.TrackerUtil.getStrVersion()%>;
 <%
 boolean isParallelize ="true".equalsIgnoreCase(ElementParameterParser.getValue(node, "__PARALLELIZE__"));
 if (isParallelize) {

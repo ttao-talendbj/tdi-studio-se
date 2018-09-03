@@ -44,6 +44,7 @@ import org.talend.commons.exception.PersistenceException;
 import org.talend.core.model.process.IContextParameter;
 import org.talend.core.model.process.IProcess2;
 import org.talend.core.model.properties.Item;
+import org.talend.core.model.properties.Property;
 import org.talend.core.model.repository.IRepositoryViewObject;
 import org.talend.core.repository.model.ProxyRepositoryFactory;
 import org.talend.core.ui.context.CustomDialogCellEditor;
@@ -238,13 +239,17 @@ public class ManageResourcePanel extends Composite {
                     }
                 }
                 JobResourceDependencyModel model = new JobResourceDependencyModel((RouteResourceItem) item);
-                model.setResourceDepPath(ResourceDependenciesUtil.getResourcePath(model,
-                        process.getProperty().getLabel() + "_" + process.getProperty().getVersion(), null));
+                Property property = process.getProperty();
+                StringBuffer joblabel = new StringBuffer();
+                if (StringUtils.isNotBlank(property.getItem().getState().getPath())) {
+                    joblabel.append(property.getItem().getState().getPath() + "/");
+                }
+                joblabel.append(property.getLabel() + "_" + property.getVersion());
+                model.setResourceDepPath(ResourceDependenciesUtil.getResourcePath(model, joblabel.toString(), null));
                 getInput().add(model);
                 resourcesTV.refresh();
                 resourcesTV.setSelection(new StructuredSelection(model));
-                ResourceDependenciesUtil.copyToExtResourceFolder(model,
-                        process.getLabel() + "_" + process.getProperty().getVersion(), null);
+                ResourceDependenciesUtil.copyToExtResourceFolder(model, joblabel.toString(), null);
                 fireDependenciesChangedListener();
             }
         }
@@ -271,10 +276,15 @@ public class ManageResourcePanel extends Composite {
             fireDependenciesChangedListener();
             ResourceDependenciesUtil.deleteFromResourceFolder(item,
                     process.getLabel() + "_" + process.getProperty().getVersion());
-            if (StringUtils.isNotBlank(item.getContextSource()) && !IContextParameter.BUILT_IN.equals(item.getContextSource())) {
-                ResourceContextHelper helper = new ResourceContextHelper(null, null);
-                helper.updateRepositoryContext(item, null);
-            }
+            /**
+             * if after want to set repository context value to default while deleting resource dependency, uncomment
+             * follow
+             */
+            // if (StringUtils.isNotBlank(item.getContextSource()) &&
+            // !IContextParameter.BUILT_IN.equals(item.getContextSource())) {
+            // ResourceContextHelper helper = new ResourceContextHelper(null, null);
+            // helper.updateRepositoryContext(item, null);
+            // }
         }
     }
 
@@ -334,14 +344,19 @@ public class ManageResourcePanel extends Composite {
         protected void setValue(Object element, Object value) {
             final JobResourceDependencyModel model = (JobResourceDependencyModel) element;
             if (!model.getSelectedVersion().equals(value)) {
-                String jobLabel = process.getLabel() + "_" + process.getProperty().getVersion();
+                Property property = process.getProperty();
+                StringBuffer joblabel = new StringBuffer();
+                if (StringUtils.isNotBlank(property.getItem().getState().getPath())) {
+                    joblabel.append(property.getItem().getState().getPath() + "/");
+                }
+                joblabel.append(property.getLabel() + "_" + property.getVersion());
                 model.setSelectedVersion((String) value);
-                model.setResourceDepPath(ResourceDependenciesUtil.getResourcePath(model, jobLabel, (String) value));
+                model.setResourceDepPath(ResourceDependenciesUtil.getResourcePath(model, joblabel.toString(), (String) value));
                 getViewer().update(element, null);
                 try {
                     IRepositoryViewObject repoObject = ProxyRepositoryFactory.getInstance()
                             .getLastVersion(model.getItem().getProperty().getId());
-                    ResourceDependenciesUtil.copyToExtResourceFolder(repoObject, jobLabel, (String) value);
+                    ResourceDependenciesUtil.copyToExtResourceFolder(repoObject, joblabel.toString(), (String) value);
                 } catch (PersistenceException e) {
                     ExceptionHandler.process(e);
                 }
@@ -390,8 +405,9 @@ public class ManageResourcePanel extends Composite {
 
                     @Override
                     protected Object openDialogBox(Control cellEditorWindow) {
+                        JobResourceDependencyModel model = (JobResourceDependencyModel) element;
                         DependenciesContextSelectionDialog dialog = new DependenciesContextSelectionDialog(
-                                cellEditorWindow.getShell(), process, commandStack);
+                                cellEditorWindow.getShell(), process, commandStack, model);
                         if (Dialog.OK == dialog.open()) {
                             result = dialog.getResult();
                         } else {

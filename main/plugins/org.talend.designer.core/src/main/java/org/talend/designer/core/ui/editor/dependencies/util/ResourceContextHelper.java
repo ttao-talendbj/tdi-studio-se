@@ -79,14 +79,14 @@ public class ResourceContextHelper {
         return true;
     }
 
-    public boolean checkIfContextVarIsInUse(String contextVar, String contextSource) {
+    public boolean checkIfContextVarIsInUse(String contextVar, String contextSource, String resStatePath) {
         List<IContext> listContext = process.getContextManager().getListContext();
         for (IContext context : listContext) {
             IContextParameter contextParameter = context.getContextParameter(contextSource, contextVar);
             if (contextParameter == null) {
                 continue;
             }
-            if (StringUtils.isNotBlank(contextParameter.getValue())) {
+            if (StringUtils.isNotBlank(contextParameter.getValue()) && !resStatePath.equals(contextParameter.getValue())) {
                 return true;
             }
         }
@@ -215,19 +215,23 @@ public class ResourceContextHelper {
             boolean resetToDefault = false;
             String defaultType = null;
             String defaultValue = null;
-            if (result == null || (sourceId.equals(originalModel.getContextSource())
-                    && !result.getName().equals(originalModel.getContextVar()))) {
-                resetToDefault = true;
-                ECodeLanguage curLanguage = LanguageManager.getCurrentLanguage();
-                if (curLanguage == ECodeLanguage.JAVA) {
-                    defaultType = ContextParameterJavaTypeManager.getDefaultJavaType().getId();
-                    defaultValue = ContextParameterJavaTypeManager
-                            .getDefaultValueFromJavaIdType(ContextParameterJavaTypeManager.getDefaultJavaType().getId(), false);
-                } else {
-                    defaultType = MetadataTalendType.getDefaultTalendType();
-                    defaultValue = TalendQuoteUtils.addQuotes(""); //$NON-NLS-1$
-                }
-            }
+            /**
+             * if after want to set repository context value to default while deleting resource dependency or changing
+             * relationship between resource and context, uncomment follow
+             */
+            // if (result == null || (sourceId.equals(originalModel.getContextSource())
+            // && !result.getName().equals(originalModel.getContextVar()))) {
+            // resetToDefault = true;
+            // ECodeLanguage curLanguage = LanguageManager.getCurrentLanguage();
+            // if (curLanguage == ECodeLanguage.JAVA) {
+            // defaultType = ContextParameterJavaTypeManager.getDefaultJavaType().getId();
+            // defaultValue = ContextParameterJavaTypeManager
+            // .getDefaultValueFromJavaIdType(ContextParameterJavaTypeManager.getDefaultJavaType().getId(), false);
+            // } else {
+            // defaultType = MetadataTalendType.getDefaultTalendType();
+            // defaultValue = TalendQuoteUtils.addQuotes(""); //$NON-NLS-1$
+            // }
+            // }
             factory.lock(object);
             ContextItem contextItem = (ContextItem) object.getProperty().getItem();
             IContextManager contextManager = new JobContextManager(contextItem.getContext(), contextItem.getDefaultContext());
@@ -235,7 +239,7 @@ public class ResourceContextHelper {
                 if (result != null) {
                     IContextParameter contextParameter = context.getContextParameter(result.getName());
                     contextParameter.setType(JavaTypesManager.RESOURCE.getId());
-                    contextParameter.setValue(originalModel.getResourceDepPath());
+                    contextParameter.setValue(originalModel.getPathUrl());
                 }
 
                 // set original to default

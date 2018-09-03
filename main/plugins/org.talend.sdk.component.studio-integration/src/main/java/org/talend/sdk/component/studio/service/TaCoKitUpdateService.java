@@ -30,6 +30,9 @@ import org.talend.sdk.component.studio.i18n.Messages;
 import org.talend.sdk.component.studio.update.TaCoKitCar;
 import org.talend.sdk.component.studio.update.TaCoKitCarFeature;
 import org.talend.sdk.component.studio.util.TaCoKitUtil;
+import org.talend.updates.runtime.model.ExtraFeature;
+import org.talend.updates.runtime.model.InstallationStatus;
+import org.talend.updates.runtime.model.InstallationStatus.Status;
 import org.talend.updates.runtime.model.interfaces.ITaCoKitCarFeature;
 import org.talend.updates.runtime.nexus.component.ComponentIndexBean;
 import org.talend.updates.runtime.service.ITaCoKitUpdateService;
@@ -113,7 +116,7 @@ public class TaCoKitUpdateService implements ITaCoKitUpdateService {
                 try {
                     monitor.subTask(Messages.getString("TaCoKitUpdateService.progress.installingFeatures.current.isInstalled", //$NON-NLS-1$
                             carFeature.getName()));
-                    if (!carFeature.isInstalled(monitor)) {
+                    if (carFeature.canBeInstalled(monitor)) {
                         monitor.subTask(Messages.getString("TaCoKitUpdateService.progress.installingFeatures.current.installing", //$NON-NLS-1$
                                 carFeature.getName()));
                         carFeature.setAutoReloadAfterInstalled(false);
@@ -132,6 +135,9 @@ public class TaCoKitUpdateService implements ITaCoKitUpdateService {
                             // nothing to do
                             break;
                         }
+                    } else {
+                        throw new Exception(Messages.getString(
+                                "TaCoKitUpdateService.progress.installingFeatures.current.cantInstall", carFeature.getName())); //$NON-NLS-1$
                     }
                 } catch (InterruptedException e) {
                     throw e;
@@ -158,6 +164,33 @@ public class TaCoKitUpdateService implements ITaCoKitUpdateService {
         }
 
         return result;
+    }
+
+    @Override
+    public Collection<ExtraFeature> filterUpdatableFeatures(Collection<ExtraFeature> features, IProgressMonitor monitor)
+            throws Exception {
+        Collection<ExtraFeature> updates = new LinkedList<>();
+        if (features == null || features.isEmpty()) {
+            return updates;
+        }
+        for (ExtraFeature feature : features) {
+            if (feature instanceof ITaCoKitCarFeature) {
+                try {
+                    InstallationStatus installationStatus = feature.getInstallationStatus(monitor);
+                    Status status = installationStatus.getStatus();
+                    /*
+                     * Here I didn't use InstallationStatus#canBeInstalled, since I think it's good to show there is an
+                     * update but need to update studio first
+                     */
+                    if (status.isInstalled() && status.canBeInstalled()) {
+                        updates.add(feature);
+                    }
+                } catch (Exception e) {
+                    ExceptionHandler.process(e);
+                }
+            }
+        }
+        return updates;
     }
 
     @Override

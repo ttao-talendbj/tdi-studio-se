@@ -43,7 +43,7 @@ imports="
 			if("MARIADB".equals(dbVersion)){
 				return "org.mariadb.jdbc.Driver";
 			}else{
-				return "org.gjt.mm.mysql.Driver";
+				return "com.mysql.cj.jdbc.Driver";
 			}
 		}
 	}//end class

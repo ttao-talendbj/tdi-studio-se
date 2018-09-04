@@ -38,7 +38,6 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
-import org.talend.camel.core.model.camelProperties.RouteResourceItem;
 import org.talend.commons.exception.ExceptionHandler;
 import org.talend.commons.exception.PersistenceException;
 import org.talend.core.model.process.IContextParameter;
@@ -46,6 +45,7 @@ import org.talend.core.model.process.IProcess2;
 import org.talend.core.model.properties.Item;
 import org.talend.core.model.properties.Property;
 import org.talend.core.model.repository.IRepositoryViewObject;
+import org.talend.core.model.resources.ResourceItem;
 import org.talend.core.repository.model.ProxyRepositoryFactory;
 import org.talend.core.ui.context.CustomDialogCellEditor;
 import org.talend.core.ui.context.model.table.ContextTableTabChildModel;
@@ -231,14 +231,14 @@ public class ManageResourcePanel extends Composite {
         DependenciesResourceSelectionDialog dialog = new DependenciesResourceSelectionDialog(getShell());
         if (Dialog.OK == dialog.open()) {
             Item item = dialog.getResult().getObject().getProperty().getItem();
-            if (item instanceof RouteResourceItem) {
+            if (item instanceof ResourceItem) {
                 for (JobResourceDependencyModel rsmodel : getInput()) {
                     if (rsmodel.getItem().getProperty().getId().equals(item.getProperty().getId())) {
                         resourcesTV.setSelection(new StructuredSelection(rsmodel));
                         return;
                     }
                 }
-                JobResourceDependencyModel model = new JobResourceDependencyModel((RouteResourceItem) item);
+                JobResourceDependencyModel model = new JobResourceDependencyModel((ResourceItem) item);
                 Property property = process.getProperty();
                 StringBuffer joblabel = new StringBuffer();
                 if (StringUtils.isNotBlank(property.getItem().getState().getPath())) {

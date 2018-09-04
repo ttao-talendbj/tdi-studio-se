@@ -50,7 +50,7 @@ public class DependenciesResourceSelectionDialog extends Dialog {
 
             @Override
             protected ERepositoryObjectType getCheckingType() {
-                return ERepositoryObjectType.valueOf(ERepositoryObjectType.class, "ROUTE_RESOURCES");
+                return ERepositoryObjectType.valueOf(ERepositoryObjectType.class, "RESOURCES");
             }
 
             @Override
@@ -130,7 +130,7 @@ public class DependenciesResourceSelectionDialog extends Dialog {
             result = (IRepositoryNode) selection.getFirstElement();
             if (result.getObject() != null
                     && result.getObject().getRepositoryObjectType() == ERepositoryObjectType.valueOf(ERepositoryObjectType.class,
-                            "ROUTE_RESOURCES")) {
+                            "RESOURCES")) {
                 return true;
             }
         }

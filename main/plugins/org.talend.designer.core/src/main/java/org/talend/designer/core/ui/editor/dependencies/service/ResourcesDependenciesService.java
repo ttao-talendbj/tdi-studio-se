@@ -1,7 +1,6 @@
 package org.talend.designer.core.ui.editor.dependencies.service;
 
 import org.apache.commons.lang.StringUtils;
-import org.talend.camel.core.model.camelProperties.RouteResourceItem;
 import org.talend.commons.exception.ExceptionHandler;
 import org.talend.commons.exception.PersistenceException;
 import org.talend.core.model.process.IProcess;
@@ -9,6 +8,7 @@ import org.talend.core.model.process.IProcess2;
 import org.talend.core.model.properties.Property;
 import org.talend.core.model.relationship.RelationshipItemBuilder;
 import org.talend.core.model.repository.IRepositoryViewObject;
+import org.talend.core.model.resources.ResourceItem;
 import org.talend.core.repository.model.ProxyRepositoryFactory;
 import org.talend.core.service.IResourcesDependenciesService;
 import org.talend.designer.core.ui.editor.dependencies.model.JobResourceDependencyModel;
@@ -44,7 +44,7 @@ public class ResourcesDependenciesService implements IResourcesDependenciesServi
                             }
                             if (repoObject != null) {
                                 JobResourceDependencyModel model = new JobResourceDependencyModel(
-                                        (RouteResourceItem) repoObject.getProperty().getItem());
+                                        (ResourceItem) repoObject.getProperty().getItem());
                                 StringBuffer joblabel = new StringBuffer();
                                 if (StringUtils.isNotBlank(property.getItem().getState().getPath())) {
                                     joblabel.append(property.getItem().getState().getPath() + "/");

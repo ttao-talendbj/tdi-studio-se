@@ -9,7 +9,6 @@ import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.talend.camel.core.model.camelProperties.RouteResourceItem;
 import org.talend.commons.exception.ExceptionHandler;
 import org.talend.commons.exception.PersistenceException;
 import org.talend.commons.utils.io.FilesUtils;
@@ -22,6 +21,7 @@ import org.talend.core.model.process.IProcess2;
 import org.talend.core.model.properties.Item;
 import org.talend.core.model.properties.Property;
 import org.talend.core.model.repository.IRepositoryViewObject;
+import org.talend.core.model.resources.ResourceItem;
 import org.talend.core.repository.model.ProxyRepositoryFactory;
 import org.talend.designer.core.ui.editor.dependencies.model.JobResourceDependencyModel;
 import org.talend.repository.ProjectManager;
@@ -40,7 +40,7 @@ public class ResourceDependenciesUtil {
 
     private static final String RESOURCES_PROP = "RESOURCES_PROP";
 
-    private static final String ROUTE_RESOURCES_FOLDER = "route_resources";
+    private static final String RESOURCES_FOLDER = "resources";
 
     private static final String SRC_RESOURCES_FOLDER = "resources";
 
@@ -97,7 +97,7 @@ public class ResourceDependenciesUtil {
             }
             if (rvo != null) {
                 final JobResourceDependencyModel model = new JobResourceDependencyModel(
-                        (RouteResourceItem) rvo.getProperty().getItem());
+                        (ResourceItem) rvo.getProperty().getItem());
                 model.setSelectedVersion(version);
                 model.setResourceDepPath(ResourceDependenciesUtil.getResourcePath(model, jobLabel, version));
                 if (StringUtils.isNotBlank(contextInfo)) {
@@ -173,13 +173,13 @@ public class ResourceDependenciesUtil {
     }
 
     public static void copyToExtResourceFolder(IRepositoryViewObject repoObject, String jobLabel, String version) {
-        JobResourceDependencyModel model = new JobResourceDependencyModel((RouteResourceItem) repoObject.getProperty().getItem());
+        JobResourceDependencyModel model = new JobResourceDependencyModel((ResourceItem) repoObject.getProperty().getItem());
         copyToExtResourceFolder(model, jobLabel, version);
     }
 
     public static String getResourcePath(JobResourceDependencyModel model, String jobLabel, String newVersion) {
         Project currentProject = ProjectManager.getInstance().getCurrentProject();
-        RouteResourceItem item = model.getItem();
+        ResourceItem item = model.getItem();
         String version = item.getProperty().getVersion();
         if (StringUtils.isNotBlank(newVersion) && !model.LATEST_VERSION.equals(newVersion)) {
             version = newVersion;
@@ -217,7 +217,7 @@ public class ResourceDependenciesUtil {
     }
 
     public static void copyToExtResourceFolder(JobResourceDependencyModel model, String jobLabel, String newVersion) {
-        RouteResourceItem item = model.getItem();
+        ResourceItem item = model.getItem();
         Project currentProject = ProjectManager.getInstance().getCurrentProject();
         String version = item.getProperty().getVersion();
         if (StringUtils.isNotBlank(newVersion) && !model.LATEST_VERSION.equals(newVersion)) {
@@ -227,7 +227,7 @@ public class ResourceDependenciesUtil {
         String projectWorkspace = ResourcesPlugin.getWorkspace().getRoot().getLocation().toOSString() + SEG_TAG
                 + currentProject.getTechnicalLabel();
         String itemResPath = model.getPathUrl() + fileSuffix;
-        File resourceFile = new File(projectWorkspace + SEG_TAG + ROUTE_RESOURCES_FOLDER + SEG_TAG + itemResPath);
+        File resourceFile = new File(projectWorkspace + SEG_TAG + RESOURCES_FOLDER + SEG_TAG + itemResPath);
         if (resourceFile.exists()) {
             String extResPath = POMS_PROCESS_FOLDER + jobLabel + SRC_EXTRESOURCE_FOLDER;
             String newFilePath = getResourcePath(model, jobLabel, newVersion);
@@ -243,7 +243,7 @@ public class ResourceDependenciesUtil {
     }
 
     public static void deleteFromResourceFolder(JobResourceDependencyModel model, String jobLabel) {
-        RouteResourceItem item = model.getItem();
+        ResourceItem item = model.getItem();
         Project currentProject = ProjectManager.getInstance().getCurrentProject();
         String projectWorkspace = ResourcesPlugin.getWorkspace().getRoot().getLocation().toOSString() + SEG_TAG
                 + currentProject.getTechnicalLabel();

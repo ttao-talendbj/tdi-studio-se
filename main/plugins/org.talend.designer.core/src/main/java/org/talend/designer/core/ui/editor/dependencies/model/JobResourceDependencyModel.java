@@ -18,11 +18,11 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
-import org.talend.camel.core.model.camelProperties.RouteResourceItem;
 import org.talend.commons.exception.ExceptionHandler;
 import org.talend.commons.exception.PersistenceException;
 import org.talend.core.model.relationship.RelationshipItemBuilder;
 import org.talend.core.model.repository.IRepositoryViewObject;
+import org.talend.core.model.resources.ResourceItem;
 import org.talend.core.model.utils.JavaResourcesHelper;
 import org.talend.core.repository.model.ProxyRepositoryFactory;
 
@@ -34,7 +34,7 @@ public class JobResourceDependencyModel {
 
     public static final String LATEST_VERSION = RelationshipItemBuilder.LATEST_VERSION;
 
-    private final RouteResourceItem item;
+    private final ResourceItem item;
 
     private String selectedVersion = LATEST_VERSION;
 
@@ -51,14 +51,14 @@ public class JobResourceDependencyModel {
 
     private final Collection<String> refNodes = new HashSet<String>();
 
-    public JobResourceDependencyModel(RouteResourceItem item) {
+    public JobResourceDependencyModel(ResourceItem item) {
         this.item = item;
     }
 
     /**
      * @return the item
      */
-    public RouteResourceItem getItem() {
+    public ResourceItem getItem() {
         return item;
     }
 

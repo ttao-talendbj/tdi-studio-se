@@ -65,7 +65,7 @@ public class CheckJobResourceDeleteReference extends AbstractCheckDeleteItemRefe
                     final ItemReferenceBean bean = new ItemReferenceBean();
                     bean.setItemName(repoObject.getLabel());
                     bean.setItemVersion(resRelatedVersion);
-                    bean.setItemType(ERepositoryObjectType.ROUTE_RESOURCES);
+                    bean.setItemType(ERepositoryObjectType.RESOURCES);
                     bean.setItemDeleted(repoObject.isDeleted());
                     bean.setReferenceItemName(property.getLabel());
                     bean.setReferenceItemVersion(property.getVersion());

@@ -15,8 +15,8 @@ package org.talend.repository.resource.ui.wizards;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
-import org.talend.camel.core.model.camelProperties.RouteResourceItem;
 import org.talend.core.model.repository.IRepositoryViewObject;
+import org.talend.core.model.resources.ResourceItem;
 import org.talend.metadata.managment.ui.wizard.PropertiesWizard;
 import org.talend.repository.resource.i18n.Messages;
 
@@ -48,7 +48,7 @@ public class EditRouteResourcePropertiesWizard extends PropertiesWizard{
 
     @Override
     public boolean performFinish() {
-        RouteResourceItem item = (RouteResourceItem) object.getProperty().getItem();
+        ResourceItem item = (ResourceItem) object.getProperty().getItem();
         Path p = new Path(object.getProperty().getLabel());
         String itemName = p.removeFileExtension().lastSegment();
         item.setName(itemName);

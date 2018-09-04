@@ -29,8 +29,8 @@ import org.talend.designer.core.ui.editor.dependencies.util.ResourceDependencies
 public class ResourcesDependenciesService implements IResourcesDependenciesService {
 
     @Override
-    public void copyToExtResourceFolder(IRepositoryViewObject repoObject, String jobLabel, String version) {
-        ResourceDependenciesUtil.copyToExtResourceFolder(repoObject, jobLabel, version);
+    public void copyToExtResourceFolder(IRepositoryViewObject repoObject, String jobLabel, String version, String rootJobLabel) {
+        ResourceDependenciesUtil.copyToExtResourceFolder(repoObject, jobLabel, version, rootJobLabel);
     }
 
     @Override
@@ -64,7 +64,7 @@ public class ResourcesDependenciesService implements IResourcesDependenciesServi
                                 joblabel.append(property.getLabel() + "_" + property.getVersion());
                                 resPath = ResourceDependenciesUtil.getResourcePath(model, joblabel.toString(), parts[1]);
                                 // to check if file exist, if not copy it
-                                ResourceDependenciesUtil.copyToExtResourceFolder(model, joblabel.toString(), parts[1]);
+                                ResourceDependenciesUtil.copyToExtResourceFolder(model, joblabel.toString(), parts[1], null);
                             }
                         }
 

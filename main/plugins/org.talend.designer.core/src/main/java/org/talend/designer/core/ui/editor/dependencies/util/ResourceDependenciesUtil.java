@@ -184,9 +184,10 @@ public class ResourceDependenciesUtil {
         }
     }
 
-    public static void copyToExtResourceFolder(IRepositoryViewObject repoObject, String jobLabel, String version) {
+    public static void copyToExtResourceFolder(IRepositoryViewObject repoObject, String jobLabel, String version,
+            String rootJobLabel) {
         JobResourceDependencyModel model = new JobResourceDependencyModel((ResourceItem) repoObject.getProperty().getItem());
-        copyToExtResourceFolder(model, jobLabel, version);
+        copyToExtResourceFolder(model, jobLabel, version, rootJobLabel);
     }
 
     public static String getResourcePath(JobResourceDependencyModel model, String jobLabel, String newVersion) {
@@ -228,7 +229,8 @@ public class ResourceDependenciesUtil {
         return newFilePath;
     }
 
-    public static void copyToExtResourceFolder(JobResourceDependencyModel model, String jobLabel, String newVersion) {
+    public static void copyToExtResourceFolder(JobResourceDependencyModel model, String jobLabel, String newVersion,
+            String rootJobLabel) {
         ResourceItem item = model.getItem();
         Project currentProject = ProjectManager.getInstance().getCurrentProject();
         String version = item.getProperty().getVersion();
@@ -241,7 +243,11 @@ public class ResourceDependenciesUtil {
         String itemResPath = model.getPathUrl() + fileSuffix;
         File resourceFile = new File(projectWorkspace + SEG_TAG + RESOURCES_FOLDER + SEG_TAG + itemResPath);
         if (resourceFile.exists()) {
-            String extResPath = POMS_PROCESS_FOLDER + jobLabel + SRC_EXTRESOURCE_FOLDER;
+            String processJobLabel = jobLabel;
+            if (StringUtils.isNotBlank(rootJobLabel)) {
+                processJobLabel = rootJobLabel;
+            }
+            String extResPath = POMS_PROCESS_FOLDER + processJobLabel + SRC_EXTRESOURCE_FOLDER;
             String newFilePath = getResourcePath(model, jobLabel, newVersion);
             File targetFile = new File(projectWorkspace + SEG_TAG + extResPath + SEG_TAG + newFilePath);
             if (!targetFile.exists()) {

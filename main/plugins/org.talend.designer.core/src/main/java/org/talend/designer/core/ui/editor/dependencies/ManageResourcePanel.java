@@ -261,7 +261,7 @@ public class ManageResourcePanel extends Composite {
                 getInput().add(model);
                 resourcesTV.refresh();
                 resourcesTV.setSelection(new StructuredSelection(model));
-                ResourceDependenciesUtil.copyToExtResourceFolder(model, joblabel.toString(), null);
+                ResourceDependenciesUtil.copyToExtResourceFolder(model, joblabel.toString(), null, null);
                 fireDependenciesChangedListener();
             }
         }
@@ -368,7 +368,7 @@ public class ManageResourcePanel extends Composite {
                 try {
                     IRepositoryViewObject repoObject = ProxyRepositoryFactory.getInstance()
                             .getLastVersion(model.getItem().getProperty().getId());
-                    ResourceDependenciesUtil.copyToExtResourceFolder(repoObject, joblabel.toString(), (String) value);
+                    ResourceDependenciesUtil.copyToExtResourceFolder(repoObject, joblabel.toString(), (String) value, null);
                 } catch (PersistenceException e) {
                     ExceptionHandler.process(e);
                 }

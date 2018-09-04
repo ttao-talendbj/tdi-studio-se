@@ -568,7 +568,7 @@ public class TalendJavaProjectManager {
                         joblabel.append(property.getItem().getState().getPath() + "/");
                     }
                     joblabel.append(property.getLabel() + "_" + property.getVersion());
-                    ResourceDependenciesUtil.copyToExtResourceFolder(repoObject, joblabel.toString(), parts[1]);
+                    ResourceDependenciesUtil.copyToExtResourceFolder(repoObject, joblabel.toString(), parts[1], null);
                 }
             }
         }

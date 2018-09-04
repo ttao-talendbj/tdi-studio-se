@@ -589,6 +589,11 @@ public class PropertyDefinitionDecorator extends SimplePropertyDefinition {
     }
 
     public Optional<Updatable> getUpdatable() {
+        if ("conf.updatableProperty".equals(delegate.getPath())) {
+            final String strategy = "identity";
+            final String target = "targetProperty";
+            return Optional.of(new Updatable(strategy, target));
+        }
         final String strategy = delegate.getMetadata().get(ACTION_UPDATABLE_STRATEGY);
         final String target = delegate.getMetadata().get(ACTION_UPDATABLE_TARGET);
         if (target != null && strategy != null) {

@@ -36,7 +36,7 @@ if(useExistingConn) {
 } else {
 	boolean specify_alias = "true".equals(ElementParameterParser.getValue(node, "__SPECIFY_DATASOURCE_ALIAS__"));
 	String dbVersion = ElementParameterParser.getValue(node, "__DB_VERSION__");
-	String drverClass= "org.gjt.mm.mysql.Driver";
+	String drverClass= "com.mysql.cj.jdbc.Driver";
 	String jdbcURL = "jdbc:mysql";
 	if("MARIADB".equals(dbVersion)){
 		drverClass = "org.mariadb.jdbc.Driver";

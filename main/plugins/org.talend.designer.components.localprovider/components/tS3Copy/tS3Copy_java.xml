@@ -260,6 +260,7 @@
                     <ITEM NAME="USERAGENT" VALUE="UserAgent"/>
                     <ITEM NAME="SOCKETRECEIVEBUFFERSIZEHINT" VALUE="SocketReceiveBufferSizeHints"/>
                     <ITEM NAME="SOCKETSENDBUFFERSIZEHINT" VALUE="SocketSendBufferSizeHints"/>
+                    <ITEM NAME="SIGNEROVERRIDE" VALUE="SignerOverride"/>
                 </ITEMS>
             </ITEM>
             <ITEM NAME="VALUE" />
@@ -281,6 +282,15 @@
       	  SHOW_IF="isShow[ASSUME_ROLE] AND (ASSUME_ROLE == 'true') AND (SET_STS_ENDPOINT == 'true')"
     	>
       	  <DEFAULT>""</DEFAULT>
+    	</PARAMETER>
+    	
+    	<PARAMETER
+    	  NAME="PART_SIZE"
+    	  FIELD="TEXT"
+    	  NUM_ROW="40"
+    	  REQUIRED="true"
+    	>
+    	  <DEFAULT>100</DEFAULT>
     	</PARAMETER>
 
     </ADVANCED_PARAMETERS>

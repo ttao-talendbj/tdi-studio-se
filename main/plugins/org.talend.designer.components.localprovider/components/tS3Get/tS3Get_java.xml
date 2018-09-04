@@ -307,6 +307,7 @@
                 <ITEM NAME="USERAGENT" VALUE="UserAgent"/>
                 <ITEM NAME="SOCKETRECEIVEBUFFERSIZEHINT" VALUE="SocketReceiveBufferSizeHints"/>
                 <ITEM NAME="SOCKETSENDBUFFERSIZEHINT" VALUE="SocketSendBufferSizeHints"/>
+                <ITEM NAME="SIGNEROVERRIDE" VALUE="SignerOverride"/>
             </ITEMS>
         </ITEM>
         <ITEM NAME="VALUE" />
@@ -328,6 +329,15 @@
       SHOW_IF="isShow[ASSUME_ROLE] AND (ASSUME_ROLE == 'true') AND (SET_STS_ENDPOINT == 'true')"
     >
       <DEFAULT>""</DEFAULT>
+    </PARAMETER>
+    
+    <PARAMETER
+      NAME="ENABLE_ACCELERATE"
+      FIELD="CHECK"
+      NUM_ROW="50"
+      SHOW_IF="(USE_EXISTING_CONNECTION == 'false')"
+    >   	
+    <DEFAULT>false</DEFAULT>
     </PARAMETER>
 
     </ADVANCED_PARAMETERS>

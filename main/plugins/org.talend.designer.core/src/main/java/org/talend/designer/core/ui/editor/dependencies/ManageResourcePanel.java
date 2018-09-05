@@ -261,7 +261,7 @@ public class ManageResourcePanel extends Composite {
                 getInput().add(model);
                 resourcesTV.refresh();
                 resourcesTV.setSelection(new StructuredSelection(model));
-                ResourceDependenciesUtil.copyToExtResourceFolder(model, joblabel.toString(), null, null);
+                ResourceDependenciesUtil.copyToExtResourceFolder(model, property.getId(), property.getVersion(), null, null);
                 fireDependenciesChangedListener();
             }
         }
@@ -286,8 +286,8 @@ public class ManageResourcePanel extends Composite {
             getInput().remove(item);
             resourcesTV.refresh();
             fireDependenciesChangedListener();
-            ResourceDependenciesUtil.deleteFromResourceFolder(item,
-                    process.getLabel() + "_" + process.getProperty().getVersion());
+            Property property = process.getProperty();
+            ResourceDependenciesUtil.deleteFromResourceFolder(item, property.getId(), property.getVersion());
             /**
              * if after want to set repository context value to default while deleting resource dependency, uncomment
              * follow
@@ -368,7 +368,8 @@ public class ManageResourcePanel extends Composite {
                 try {
                     IRepositoryViewObject repoObject = ProxyRepositoryFactory.getInstance()
                             .getLastVersion(model.getItem().getProperty().getId());
-                    ResourceDependenciesUtil.copyToExtResourceFolder(repoObject, joblabel.toString(), (String) value, null);
+                    ResourceDependenciesUtil.copyToExtResourceFolder(repoObject, property.getId(), property.getVersion(),
+                            (String) value, null);
                 } catch (PersistenceException e) {
                     ExceptionHandler.process(e);
                 }

@@ -56,7 +56,7 @@ public class ResourceDependenciesUtil {
 
     private static final String SRC_RESOURCES_FOLDER = "resources";
 
-    private static final String POMS_PROCESS_FOLDER = "poms/jobs/process/";
+    private static final String POMS_JOBS_FOLDER = "poms/jobs/";
 
     private static final String SRC_EXTRESOURCE_FOLDER = "/src/main/ext-resources";
 
@@ -184,10 +184,10 @@ public class ResourceDependenciesUtil {
         }
     }
 
-    public static void copyToExtResourceFolder(IRepositoryViewObject repoObject, String jobLabel, String version,
+    public static void copyToExtResourceFolder(IRepositoryViewObject repoObject, String jobId, String jobVersion, String version,
             String rootJobLabel) {
         JobResourceDependencyModel model = new JobResourceDependencyModel((ResourceItem) repoObject.getProperty().getItem());
-        copyToExtResourceFolder(model, jobLabel, version, rootJobLabel);
+        copyToExtResourceFolder(model, jobId, jobVersion, version, rootJobLabel);
     }
 
     public static String getResourcePath(JobResourceDependencyModel model, String jobLabel, String newVersion) {
@@ -229,8 +229,24 @@ public class ResourceDependenciesUtil {
         return newFilePath;
     }
 
-    public static void copyToExtResourceFolder(JobResourceDependencyModel model, String jobLabel, String newVersion,
-            String rootJobLabel) {
+    public static void copyToExtResourceFolder(JobResourceDependencyModel model, String jobId, String jobVersion,
+            String newVersion, String rootJobLabel) {
+        IRepositoryViewObject jobObject = null;
+        try {
+            jobObject = ProxyRepositoryFactory.getInstance().getSpecificVersion(jobId, jobVersion, true);
+        } catch (PersistenceException e1) {
+            ExceptionHandler.process(e1);
+        }
+        if (jobObject == null) {
+            return;
+        }
+        Property property = jobObject.getProperty();
+        StringBuffer joblabel = new StringBuffer();
+        if (StringUtils.isNotBlank(property.getItem().getState().getPath())) {
+            joblabel.append(property.getItem().getState().getPath() + "/");
+        }
+        joblabel.append(property.getLabel() + "_" + property.getVersion());
+
         ResourceItem item = model.getItem();
         Project currentProject = ProjectManager.getInstance().getCurrentProject();
         String version = item.getProperty().getVersion();
@@ -243,12 +259,12 @@ public class ResourceDependenciesUtil {
         String itemResPath = model.getPathUrl() + fileSuffix;
         File resourceFile = new File(projectWorkspace + SEG_TAG + RESOURCES_FOLDER + SEG_TAG + itemResPath);
         if (resourceFile.exists()) {
-            String processJobLabel = jobLabel;
+            String processJobLabel = joblabel.toString();
             if (StringUtils.isNotBlank(rootJobLabel)) {
                 processJobLabel = rootJobLabel;
             }
-            String extResPath = POMS_PROCESS_FOLDER + processJobLabel + SRC_EXTRESOURCE_FOLDER;
-            String newFilePath = getResourcePath(model, jobLabel, newVersion);
+            String extResPath = getProcessFolder(jobObject) + processJobLabel + SRC_EXTRESOURCE_FOLDER;
+            String newFilePath = getResourcePath(model, joblabel.toString(), newVersion);
             File targetFile = new File(projectWorkspace + SEG_TAG + extResPath + SEG_TAG + newFilePath);
             if (!targetFile.exists()) {
                 try {
@@ -260,7 +276,24 @@ public class ResourceDependenciesUtil {
         }
     }
 
-    public static void deleteFromResourceFolder(JobResourceDependencyModel model, String jobLabel) {
+    public static void deleteFromResourceFolder(JobResourceDependencyModel model, String jobId, String jobVersion) {
+        IRepositoryViewObject jobObject = null;
+        try {
+            jobObject = ProxyRepositoryFactory.getInstance().getSpecificVersion(jobId, jobVersion, true);
+        } catch (PersistenceException e1) {
+            ExceptionHandler.process(e1);
+        }
+        if (jobObject == null) {
+            return;
+        }
+        Property property = jobObject.getProperty();
+        StringBuffer labelBuf = new StringBuffer();
+        if (StringUtils.isNotBlank(property.getItem().getState().getPath())) {
+            labelBuf.append(property.getItem().getState().getPath() + "/");
+        }
+        labelBuf.append(property.getLabel() + "_" + property.getVersion());
+        String jobLabel = labelBuf.toString();
+
         ResourceItem item = model.getItem();
         Project currentProject = ProjectManager.getInstance().getCurrentProject();
         String projectWorkspace = ResourcesPlugin.getWorkspace().getRoot().getLocation().toOSString() + SEG_TAG
@@ -269,7 +302,7 @@ public class ResourceDependenciesUtil {
         if (!"".equals(item.getState().getPath())) {
             statePath = item.getState().getPath() + SEG_TAG;
         }
-        String extResPath = POMS_PROCESS_FOLDER + jobLabel + SRC_EXTRESOURCE_FOLDER;
+        String extResPath = getProcessFolder(jobObject) + jobLabel + SRC_EXTRESOURCE_FOLDER;
         // for job testjob_0.2 => testjob_0_2
         String checkversion = jobLabel.substring(jobLabel.lastIndexOf("_"));
         if (checkversion.contains(".")) {
@@ -289,6 +322,11 @@ public class ResourceDependenciesUtil {
                 }
             }
         }
+    }
+
+    private static String getProcessFolder(IRepositoryViewObject jobObject) {
+        String folder = jobObject.getRepositoryObjectType().getFolder();
+        return POMS_JOBS_FOLDER + folder + "/";
     }
 
 }

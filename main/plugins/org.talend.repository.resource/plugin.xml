@@ -156,6 +156,7 @@
             id="org.talend.repository.resource.editors.RouteResourceEditor">
       </editor>
    </extension>
+
    <extension
          point="org.talend.repository.items.importexport.handler">
       <importItemsProvider
@@ -185,6 +186,18 @@
             class="org.talend.repository.resource.delete.CheckJobResourceDeleteReference"
             priority="normal">
       </check>
+   </extension>
+   
+   <extension
+         point="org.eclipse.ui.navigator.viewer">
+      <viewerContentBinding
+            viewerId="org.talend.repository.cnf.view">
+         <includes>
+            <contentExtension
+                  pattern="org.talend.repository.view.route.route_resource">
+            </contentExtension>
+         </includes>
+      </viewerContentBinding>
    </extension>
 
 </plugin>

@@ -50,11 +50,13 @@ if(columnList != null && columnList.size() > 0) {
 
         String dbproperties = ElementParameterParser.getValue(node, "__PROPERTIES__");
         String dbVersion = ElementParameterParser.getValue(node, "__DB_VERSION__");
-		String drverClass= "com.mysql.cj.jdbc.Driver";
+		String drverClass= "com.mysql.jdbc.Driver";
 		String jdbcURL = "jdbc:mysql";
 		if("MARIADB".equals(dbVersion)){
 			drverClass = "org.mariadb.jdbc.Driver";
 			jdbcURL = "jdbc:mariadb";
+		} else if ("MYSQL_8".equals(dbVersion)){
+			drverClass= "com.mysql.cj.jdbc.Driver";
 		}
         %>
         java.lang.Class.forName("<%=drverClass%>");

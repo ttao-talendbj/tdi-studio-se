@@ -67,11 +67,13 @@ java.sql.Connection conn_<%=cid%> = null;
 		log4jCodeGenerateUtil.useExistConnection(node);
 	} else {
 		String dbVersion = ElementParameterParser.getValue(node, "__DB_VERSION__");
-		String drverClass= "com.mysql.cj.jdbc.Driver";
+		String drverClass= "com.mysql.jdbc.Driver";
 		String jdbcURL = "jdbc:mysql";
 		if("MARIADB".equals(dbVersion)){
 			drverClass = "org.mariadb.jdbc.Driver";
 			jdbcURL = "jdbc:mariadb";
+		} else if ("MYSQL_8".equals(dbVersion)){
+			drverClass = "com.mysql.cj.jdbc.Driver";
 		}
 		%>
 		String driverClass_<%=cid%> = "<%=drverClass%>";

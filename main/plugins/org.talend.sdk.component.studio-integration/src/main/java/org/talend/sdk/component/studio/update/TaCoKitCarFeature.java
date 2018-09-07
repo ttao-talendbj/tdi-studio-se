@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
@@ -156,14 +155,33 @@ public class TaCoKitCarFeature extends AbstractExtraFeature implements ITaCoKitC
 
     @SuppressWarnings("nls")
     public boolean install(IProgressMonitor progress) throws Exception {
-        TaCoKitCar tckCar = getCar(progress);
-        String[] carCmd = new String[] {
-                new File(System.getProperty("java.home"),
-                        "bin/java" + (System.getProperty("os.name").toLowerCase(Locale.ROOT).contains("win") ? ".exe" : ""))
-                        .getAbsolutePath(),
-                "-jar", "\"" + tckCar.getCarFile().getAbsolutePath() + "\"", "studio-deploy",
-                "\"" + URIUtil.toFile(Platform.getInstallLocation().getURL().toURI()).getAbsolutePath() + "\"" };
-        Process exec = Runtime.getRuntime().exec(carCmd);
+        String tckCarPath = getCar(progress).getCarFile().getAbsolutePath();
+        String installationPath = URIUtil.toFile(Platform.getInstallLocation().getURL().toURI()).getAbsolutePath();
+
+        StringBuilder commandBuilder = new StringBuilder();
+        commandBuilder.append("java -jar "); //$NON-NLS-1$
+        commandBuilder.append(StringUtils.wrap(tckCarPath, "\"")); //$NON-NLS-1$
+        commandBuilder.append(" studio-deploy "); //$NON-NLS-1$
+        commandBuilder.append(StringUtils.wrap(installationPath, "\"")); //$NON-NLS-1$
+        String command = commandBuilder.toString();
+
+        String osName = System.getProperty("os.name"); //$NON-NLS-1$
+        String[] cmd = new String[3];
+        if (osName.startsWith("Windows")) { //$NON-NLS-1$
+            cmd[0] = "cmd.exe"; //$NON-NLS-1$
+            cmd[1] = "/C"; //$NON-NLS-1$
+            cmd[2] = command;
+        } else if (osName.startsWith("Mac")) { //$NON-NLS-1$
+            cmd[0] = "/bin/bash"; //$NON-NLS-1$
+            cmd[1] = "-c"; //$NON-NLS-1$
+            cmd[2] = command;
+        } else {
+            // linux
+            cmd[0] = "/bin/bash"; //$NON-NLS-1$
+            cmd[1] = "-c"; //$NON-NLS-1$
+            cmd[2] = command;
+        }
+        Process exec = Runtime.getRuntime().exec(cmd);
         while (exec.isAlive()) {
             Thread.sleep(100);
             TaCoKitUtil.checkMonitor(progress);

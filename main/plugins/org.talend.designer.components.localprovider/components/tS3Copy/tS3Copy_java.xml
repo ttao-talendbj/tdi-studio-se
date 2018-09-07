@@ -260,6 +260,7 @@
                     <ITEM NAME="USERAGENT" VALUE="UserAgent"/>
                     <ITEM NAME="SOCKETRECEIVEBUFFERSIZEHINT" VALUE="SocketReceiveBufferSizeHints"/>
                     <ITEM NAME="SOCKETSENDBUFFERSIZEHINT" VALUE="SocketSendBufferSizeHints"/>
+                    <ITEM NAME="SIGNEROVERRIDE" VALUE="SignerOverride"/>
                 </ITEMS>
             </ITEM>
             <ITEM NAME="VALUE" />
@@ -283,14 +284,6 @@
       	  <DEFAULT>""</DEFAULT>
     	</PARAMETER>
     	
-    	<PARAMETER
-		  NAME="NOTE"
-		  FIELD="LABEL"
-		  NUM_ROW="37"
-		>
-			<DEFAULT>This option only applies when object is larger than 5GB, should not work with the s3 object whose meta data is important like client encrypt</DEFAULT>
-		</PARAMETER>
-		
     	<PARAMETER
     	  NAME="PART_SIZE"
     	  FIELD="TEXT"

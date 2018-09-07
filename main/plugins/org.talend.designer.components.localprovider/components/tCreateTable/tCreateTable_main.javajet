@@ -923,10 +923,12 @@ class MysqlManager extends Manager {
     }
     protected String getDriver() {
         if("MARIADB".equals(dbVersion)){
-			return "org.mariadb.jdbc.Driver";
-		}else{
-			return "org.gjt.mm.mysql.Driver";
-		}
+            return "org.mariadb.jdbc.Driver";
+        } else if ("MYSQL_8".equals(dbVersion)){
+            return "com.mysql.cj.jdbc.Driver";
+        } else {
+            return "com.mysql.jdbc.Driver";
+        }
     }
     public String getConnectionURL() {
     	String jdbcURL = "\"jdbc:mysql\"";

@@ -90,8 +90,8 @@
 			<build>
 				<plugins>
 					<plugin>
-						<groupId>org.talend</groupId>
-						<artifactId>signature</artifactId>
+						<groupId>org.talend.ci</groupId>
+						<artifactId>signer-maven-plugin</artifactId>
 						<version>${talend.version}</version>
 						<executions>
 							<execution>

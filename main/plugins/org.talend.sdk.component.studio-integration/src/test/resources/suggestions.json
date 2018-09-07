@@ -165,6 +165,55 @@
         }
       ],
       "type": "validation"
+    },
+    {
+      "family": "qa",
+      "name": "basedOnTable",
+      "properties": [
+        {
+          "displayName": "table",
+          "metadata": {
+            "definition::parameter::index": "0"
+          },
+          "name": "table",
+          "path": "table",
+          "placeholder": "table",
+          "type": "ARRAY"
+        },
+        {
+          "displayName": "check",
+          "metadata": {},
+          "name": "check",
+          "path": "table[].check",
+          "placeholder": "check",
+          "type": "BOOLEAN"
+        },
+        {
+          "displayName": "number",
+          "metadata": {},
+          "name": "table[].number",
+          "path": "number",
+          "placeholder": "number",
+          "type": "NUMBER"
+        },
+        {
+          "displayName": "operator",
+          "metadata": {},
+          "name": "table[].operator",
+          "path": "operator",
+          "placeholder": "operator",
+          "type": "ENUM"
+        },
+        {
+          "displayName": "strColumn",
+          "metadata": {},
+          "name": "table[].strColumn",
+          "path": "strColumn",
+          "placeholder": "strColumn",
+          "type": "STRING"
+        }
+      ],
+      "type": "suggestions"
     }
   ],
   "name": "suggestion",
@@ -204,6 +253,22 @@
         }
       },
       "root": false
+    },
+    {
+      "fieldType": "TEXT",
+      "property": {
+        "delegate": {
+          "displayName": "basedOnTable",
+          "metadata": {
+            "action::suggestions": "basedOnTable",
+            "action::suggestions::parameters": "table"
+          },
+          "name": "basedOnTable",
+          "path": "conf.basedOnTable",
+          "type": "STRING"
+        }
+      },
+      "root": false
     }
   ],
   "properties": [
@@ -217,6 +282,10 @@
     {
       "name": "conf.another",
       "value": "another value"
+    },
+    {
+      "name": "conf.basedOnTable",
+      "value": "based on table"
     },
     {
       "name": "conf.basedOnTwoPrimitives",

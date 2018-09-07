@@ -22,6 +22,8 @@ import java.util.Map;
 import org.talend.core.model.process.IElement;
 import org.talend.core.runtime.IAdditionalInfo;
 import org.talend.designer.core.model.components.ElementParameter;
+import org.talend.sdk.component.studio.model.action.IActionParameter;
+import org.talend.sdk.component.studio.model.action.SettingsActionParameter;
 
 /**
  * DOC cmeng class global comment. Detailled comment
@@ -208,5 +210,16 @@ public class TaCoKitElementParameter extends ElementParameter implements IAdditi
      */
     public boolean isPersisted() {
         return true;
+    }
+
+    /**
+     * Creates IActionParameter
+     *
+     * @param actionParameter action parameter name
+     * @return IActionParameter
+     */
+    public IActionParameter createActionParameter(final String actionParameter) {
+        final IActionParameter parameter = new SettingsActionParameter(this, actionParameter);
+        return parameter;
     }
 }

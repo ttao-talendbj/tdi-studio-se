@@ -35,8 +35,10 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.part.EditorPart;
 import org.talend.core.model.relationship.RelationshipItemBuilder;
+import org.talend.core.runtime.CoreRuntimePlugin;
 import org.talend.core.ui.editor.JobEditorInput;
 import org.talend.designer.core.DesignerPlugin;
+import org.talend.designer.core.IDesignerCoreService;
 import org.talend.designer.core.i18n.Messages;
 import org.talend.designer.core.ui.AbstractMultiPageTalendEditor;
 import org.talend.designer.core.ui.editor.dependencies.controls.SearchControl;
@@ -186,6 +188,11 @@ public class JobDependenciesEditor extends EditorPart implements IJobDependencie
                 ResourceDependenciesUtil.setContextVarForResources(getJobEditorInput().getLoadedProcess(),
                         manageRouteResourcePanel.getInput());
                 RelationshipItemBuilder.getInstance().addOrUpdateItem(getJobEditorInput().getItem());
+
+                IDesignerCoreService designerCoreService = CoreRuntimePlugin.getInstance().getDesignerCoreService();
+                if (designerCoreService != null) {
+                    designerCoreService.switchToCurContextsView();
+                }
 
             }
         };

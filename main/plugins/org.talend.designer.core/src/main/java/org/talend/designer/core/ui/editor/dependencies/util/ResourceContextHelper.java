@@ -36,7 +36,6 @@ import org.talend.core.language.LanguageManager;
 import org.talend.core.model.context.ContextUtils;
 import org.talend.core.model.context.JobContextManager;
 import org.talend.core.model.context.JobContextParameter;
-import org.talend.core.model.metadata.MetadataTalendType;
 import org.talend.core.model.metadata.types.ContextParameterJavaTypeManager;
 import org.talend.core.model.metadata.types.JavaTypesManager;
 import org.talend.core.model.process.IContext;
@@ -49,7 +48,6 @@ import org.talend.core.model.update.RepositoryUpdateManager;
 import org.talend.core.repository.model.ProxyRepositoryFactory;
 import org.talend.core.runtime.CoreRuntimePlugin;
 import org.talend.core.ui.context.ContextTemplateComposite;
-import org.talend.core.ui.context.model.ContextTabChildModel;
 import org.talend.core.ui.context.model.table.ContextTableTabChildModel;
 import org.talend.core.ui.context.model.table.ContextTableTabParentModel;
 import org.talend.core.ui.context.nattableTree.ContextNatTableUtils;
@@ -143,13 +141,15 @@ public class ResourceContextHelper {
 
         for (ContextTableTabParentModel contextModel : listofData) {
             if (contextModel.hasChildren()) {
-                JobContextTreeNode parentTreeNode = createJobContextTreeNode(contextModel.getOrder(), contextModel, null,
-                        contextModel.getSourceName(), treeNodes);
-                List<ContextTabChildModel> childModels = contextModel.getChildren();
-                for (ContextTabChildModel childModel : childModels) {
-                    createJobContextTreeNode(contextModel.getOrder(), childModel, parentTreeNode,
-                            childModel.getContextParameter().getName(), treeNodes);
-                }
+                // currently will not display repository context variable, later improve should uncomment follow
+                // JobContextTreeNode parentTreeNode = createJobContextTreeNode(contextModel.getOrder(), contextModel,
+                // null,
+                // contextModel.getSourceName(), treeNodes);
+                // List<ContextTabChildModel> childModels = contextModel.getChildren();
+                // for (ContextTabChildModel childModel : childModels) {
+                // createJobContextTreeNode(contextModel.getOrder(), childModel, parentTreeNode,
+                // childModel.getContextParameter().getName(), treeNodes);
+                // }
             } else {
                 createJobContextTreeNode(contextModel.getOrder(), contextModel, null,
                         contextModel.getContextParameter().getName(),
@@ -161,8 +161,15 @@ public class ResourceContextHelper {
 
     private JobContextTreeNode createJobContextTreeNode(int orderId, Object data,
             JobContextTreeNode parent, String currentNodeName, List<JobContextTreeNode> treeNodes) {
-        JobContextTreeNode datum = new JobContextTreeNode(orderId, data, parent, currentNodeName);
-        treeNodes.add(datum);
+        IContextParameter contextParameter = ((ContextTableTabParentModel) data).getContextParameter();
+        JobContextTreeNode datum = null;
+        if ((JavaTypesManager.RESOURCE.getId().equals(contextParameter.getType())
+                || JavaTypesManager.RESOURCE.getLabel().equals(contextParameter.getType()))
+                && StringUtils.isBlank(contextParameter.getValue())) {
+            datum = new JobContextTreeNode(orderId, data, parent, currentNodeName);
+            treeNodes.add(datum);
+
+        }
         return datum;
     }
 
@@ -189,11 +196,7 @@ public class ResourceContextHelper {
         JobContextParameter contextParam = new JobContextParameter();
         contextParam.setName(paramName);
         ECodeLanguage curLanguage = LanguageManager.getCurrentLanguage();
-        if (curLanguage == ECodeLanguage.JAVA) {
-            contextParam.setType(ContextParameterJavaTypeManager.getDefaultJavaType().getId());
-        } else {
-            contextParam.setType(MetadataTalendType.getDefaultTalendType());
-        }
+        contextParam.setType(JavaTypesManager.RESOURCE.getId());
         contextParam.setPrompt(paramName + "?"); //$NON-NLS-1$
         String defaultValue;
         if (curLanguage == ECodeLanguage.JAVA) {

@@ -93,6 +93,10 @@ public class ManageResourcePanel extends Composite {
 
     private CommandStack commandStack;
 
+    public TableViewer getResourcesTV() {
+        return resourcesTV;
+    }
+
     public void setProcess(IProcess2 process) {
         this.process = process;
     }

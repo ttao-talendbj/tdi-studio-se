@@ -1804,6 +1804,10 @@ public abstract class AbstractMultiPageTalendEditor extends MultiPageEditorPart 
         return designerEditor;
     }
 
+    public JobDependenciesEditor getDependenciesEditor() {
+        return dependenciesEditor;
+    }
+
     public void beforeDispose() {
         if (null != jobletEditor) {
             IColumnSupport cs = (IColumnSupport) jobletEditor.getAdapter(IColumnSupport.class);

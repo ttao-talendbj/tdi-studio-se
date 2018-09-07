@@ -21,6 +21,7 @@ import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.Path;
 import org.talend.commons.exception.ExceptionHandler;
 import org.talend.commons.exception.PersistenceException;
 import org.talend.commons.utils.io.FilesUtils;
@@ -30,7 +31,6 @@ import org.talend.core.model.metadata.types.JavaTypesManager;
 import org.talend.core.model.process.IContext;
 import org.talend.core.model.process.IContextParameter;
 import org.talend.core.model.process.IProcess2;
-import org.talend.core.model.properties.Item;
 import org.talend.core.model.properties.Property;
 import org.talend.core.model.repository.IRepositoryViewObject;
 import org.talend.core.model.resources.ResourceItem;
@@ -60,15 +60,6 @@ public class ResourceDependenciesUtil {
 
     private static final String SRC_EXTRESOURCE_FOLDER = "/src/main/ext-resources";
 
-    public static Collection<JobResourceDependencyModel> getResourceDependencies(Item item) {
-        StringBuffer joblabel = new StringBuffer();
-        if (StringUtils.isNotBlank(item.getState().getPath())) {
-            joblabel.append(item.getState().getPath() + "/");
-        }
-        joblabel.append(item.getProperty().getLabel() + "_" + item.getProperty().getVersion());
-        return getResourceDependencies((String) item.getProperty().getAdditionalProperties().get(RESOURCES_PROP),
-                joblabel.toString());
-    }
 
     public static Collection<JobResourceDependencyModel> getResourceDependencies(IProcess2 process) {
         Property property = process.getProperty();
@@ -77,17 +68,18 @@ public class ResourceDependenciesUtil {
             joblabel.append(property.getItem().getState().getPath() + "/");
         }
         joblabel.append(property.getLabel() + "_" + property.getVersion());
-        return getResourceDependencies((String) process.getAdditionalProperties().get(RESOURCES_PROP), joblabel.toString());
+        return getResourceDependencies((String) process.getAdditionalProperties().get(RESOURCES_PROP), joblabel.toString(),
+                process);
     }
 
-    private static Collection<JobResourceDependencyModel> getResourceDependencies(String resource, String jobLabel) {
+    private static Collection<JobResourceDependencyModel> getResourceDependencies(String resource, String jobLabel,
+            IProcess2 process) {
         Collection<JobResourceDependencyModel> models = new ArrayList<JobResourceDependencyModel>();
         if (resource != null) {
             for (String id : resource.split(COMMA_TAG)) {
                 String[] parts = id.split(REPACE_SLASH_TAG);
                 if (parts.length == 2 || parts.length > 2) {
-                    JobResourceDependencyModel model = createDependency(parts[0], parts[1], parts.length > 2 ? parts[2] : null,
-                            jobLabel);
+                    JobResourceDependencyModel model = createDependency(parts[0], parts[1], jobLabel, process);
                     // if the Resource item was force deleted, model would be null
                     if (model != null) {
                         models.add(model);
@@ -99,7 +91,8 @@ public class ResourceDependenciesUtil {
         return models;
     }
 
-    public static JobResourceDependencyModel createDependency(String id, String version, String contextInfo, String jobLabel) {
+    public static JobResourceDependencyModel createDependency(String id, String version, String jobLabel,
+            IProcess2 process) {
         try {
             final IRepositoryViewObject rvo;
             if (JobResourceDependencyModel.LATEST_VERSION.equals(version)) {
@@ -112,17 +105,33 @@ public class ResourceDependenciesUtil {
                         (ResourceItem) rvo.getProperty().getItem());
                 model.setSelectedVersion(version);
                 model.setResourceDepPath(ResourceDependenciesUtil.getResourcePath(model, jobLabel, version));
-                if (StringUtils.isNotBlank(contextInfo)) {
-                    String[] contextPart = contextInfo.split(COLON_TAG);
-                    if (contextPart.length == 2) {
-                        model.setContextVar(contextPart[0]);
-                        model.setContextSource(contextPart[1]);
-                    }
+                
+                IContextParameter contextPar = getContextOfResouceByProcess(process, rvo.getId(), version);
+                if (contextPar != null) {
+                    model.setContextVar(contextPar.getName());
+                    model.setContextSource(contextPar.getSource());
                 }
                 return model;
             }
         } catch (PersistenceException e) {
             ExceptionHandler.process(e);
+        }
+        return null;
+    }
+
+    public static IContextParameter getContextOfResouceByProcess(IProcess2 process, String resourceId, String resourceVersion) {
+        List<IContextParameter> contextParameterList = process.getContextManager().getDefaultContext().getContextParameterList();
+        for (IContextParameter contextPar : contextParameterList) {
+            if (JavaTypesManager.RESOURCE.getId().equals(contextPar.getType())
+                    || JavaTypesManager.RESOURCE.getLabel().equals(contextPar.getType())) {
+                String resource = contextPar.getValue();
+                if (StringUtils.isNotBlank(resource) && resource.contains(SLASH_TAG)) {
+                    String[] part = resource.split(REPACE_SLASH_TAG);
+                    if (part[0].equals(resourceId) && part[1].equals(resourceVersion)) {
+                        return contextPar;
+                    }
+                }
+            }
         }
         return null;
     }
@@ -139,10 +148,6 @@ public class ResourceDependenciesUtil {
             sb.append(item.getItem().getProperty().getId());
             sb.append(SLASH_TAG);
             sb.append(item.getSelectedVersion());
-            if (StringUtils.isNotBlank(item.getContextVar())) {
-                sb.append(SLASH_TAG);
-                sb.append(item.getContextVar() + COLON_TAG + item.getContextSource());
-            }
         }
         if (sb.length() > 0) {
             map.put(RESOURCES_PROP, sb.toString());
@@ -152,27 +157,27 @@ public class ResourceDependenciesUtil {
     }
 
     public static void setContextVarForResources(IProcess2 process, Collection<JobResourceDependencyModel> models) {
+        IContext defaultContext = process.getContextManager().getDefaultContext();
         List<IContext> listContext = process.getContextManager().getListContext();
         // for remove resources data clean all context variable
-        cleanAllResourceContextVariable(listContext);
+        cleanAllResourceContextVariable(listContext, defaultContext.getName());
         for (JobResourceDependencyModel item : models) {
             if (StringUtils.isNotBlank(item.getContextVar())) {
-                for (IContext contextParameters : listContext) {
-                    // List<IContextParameter> contextParameterList = contextParameters.getContextParameterList();
-                    IContextParameter contextPar = contextParameters.getContextParameter(item.getContextSource(),
-                            item.getContextVar());
-                    if (contextPar != null) {
-                        contextPar.setType(JavaTypesManager.RESOURCE.getId());
-                        contextPar.setValue(item.getPathUrl());
-                    }
+                IContextParameter contextPar = defaultContext.getContextParameter(item.getContextSource(), item.getContextVar());
+                if (contextPar != null) {
+                    contextPar.setType(JavaTypesManager.RESOURCE.getId());
+                    contextPar.setValue(createResourceContextValue(item));
                 }
             }
         }
         process.getContextManager().fireContextsChangedEvent();
     }
 
-    private static void cleanAllResourceContextVariable(List<IContext> listContext) {
+    private static void cleanAllResourceContextVariable(List<IContext> listContext, String contextName) {
         for (IContext context : listContext) {
+            if (!context.getName().equals(contextName)) {
+                continue;
+            }
             for (IContextParameter contextPar : context.getContextParameterList()) {
                 if (contextPar.getType().equals(JavaTypesManager.RESOURCE.getId())
                         && StringUtils.isNotBlank(contextPar.getValue())
@@ -207,11 +212,14 @@ public class ResourceDependenciesUtil {
                 ExceptionHandler.process(e);
             }
         }
-        String statePath = "";
+
+        StringBuffer resourcePath = new StringBuffer();
         if (!"".equals(item.getState().getPath())) {
-            statePath = item.getState().getPath() + SEG_TAG;
+            resourcePath.append(item.getState().getPath() + SEG_TAG);
         }
-        String fileSuffix = "_" + version + "." + item.getBindingExtension();
+        Path p = new Path(item.getProperty().getLabel());
+        resourcePath.append(p.removeFileExtension().lastSegment());
+        resourcePath.append("_" + version + "." + item.getBindingExtension());
         // for job testjob_0.2 => testjob_0_2
         String checkversion = jobLabel.substring(jobLabel.lastIndexOf("_"));
         if (checkversion.contains(".")) {
@@ -224,8 +232,7 @@ public class ResourceDependenciesUtil {
          * ext-resources/local_project/testjob_0_2/contexts
          */
         String newFilePath = currentProject.getLabel().toLowerCase() + SEG_TAG + jobLabel + SEG_TAG + SRC_RESOURCES_FOLDER
-                + SEG_TAG + statePath
-                + item.getName() + fileSuffix;
+                + SEG_TAG + resourcePath.toString();
         return newFilePath;
     }
 
@@ -295,6 +302,8 @@ public class ResourceDependenciesUtil {
         String jobLabel = labelBuf.toString();
 
         ResourceItem item = model.getItem();
+        Path p = new Path(item.getProperty().getLabel());
+        String itenName = p.removeFileExtension().lastSegment();
         Project currentProject = ProjectManager.getInstance().getCurrentProject();
         String projectWorkspace = ResourcesPlugin.getWorkspace().getRoot().getLocation().toOSString() + SEG_TAG
                 + currentProject.getTechnicalLabel();
@@ -317,7 +326,7 @@ public class ResourceDependenciesUtil {
                 if (file.isDirectory()) {
                     continue;
                 }
-                if (item.getName().equals(file.getName().substring(0, file.getName().lastIndexOf("_")))) {
+                if (itenName.equals(file.getName().substring(0, file.getName().lastIndexOf("_")))) {
                     file.delete();
                 }
             }
@@ -327,6 +336,10 @@ public class ResourceDependenciesUtil {
     private static String getProcessFolder(IRepositoryViewObject jobObject) {
         String folder = jobObject.getRepositoryObjectType().getFolder();
         return POMS_JOBS_FOLDER + folder + "/";
+    }
+
+    public static String createResourceContextValue(JobResourceDependencyModel model) {
+        return model.getItem().getProperty().getId() + SLASH_TAG + model.getSelectedVersion();
     }
 
 }

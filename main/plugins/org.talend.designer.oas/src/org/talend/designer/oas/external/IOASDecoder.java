@@ -15,6 +15,8 @@ package org.talend.designer.oas.external;
 import java.nio.file.Path;
 import java.util.Map;
 
+import org.eclipse.core.runtime.MultiStatus;
+
 /**
  * DOC dsergent class global comment. Detailled comment
  */
@@ -23,6 +25,8 @@ public interface IOASDecoder {
     public void setOASSourceFile(Path path);
 
     public ETranslationStatus getTranslationStatus() throws TranslationException;
+    
+    public MultiStatus getProblems();
 
     public String getEndpoint();
 

@@ -51,7 +51,7 @@ public class ResourcesDependenciesService implements IResourcesDependenciesServi
             }
             try {
                 String[] parts = resourceContextValue.split("\\|");
-                if (parts.length > 2) {
+                if (parts.length > 1) {
                     IRepositoryViewObject repoObject = null;
                     if (RelationshipItemBuilder.LATEST_VERSION.equals(parts[1])) {
                         repoObject = ProxyRepositoryFactory.getInstance().getLastVersion(parts[0]);

@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.emf.codegen.jet.JETException;
@@ -342,8 +343,9 @@ public class CodeGenerator implements ICodeGenerator {
                             }
                         }
                         listParametersCopy.add(icp);
-                    } else if (JavaTypesManager.RESOURCE.getId().equals(iContextParameter.getType())
-                            || JavaTypesManager.RESOURCE.getLabel().equals(iContextParameter.getType())) {
+                    } else if ((JavaTypesManager.RESOURCE.getId().equals(iContextParameter.getType())
+                            || JavaTypesManager.RESOURCE.getLabel().equals(iContextParameter.getType()))
+                            && StringUtils.isNotBlank(iContextParameter.getValue())) {
                         if (GlobalServiceRegister.getDefault().isServiceRegistered(IResourcesDependenciesService.class)) {
                             IContextParameter contextPar = iContextParameter.clone();
                             IResourcesDependenciesService resourceService = (IResourcesDependenciesService) GlobalServiceRegister

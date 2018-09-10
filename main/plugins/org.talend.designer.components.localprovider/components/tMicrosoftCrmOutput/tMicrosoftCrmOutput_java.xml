@@ -29020,15 +29020,14 @@
                 UrlPath="platform:/plugin/org.talend.libraries.apache.cxf/lib/slf4j-jdk14-1.7.12.jar"
                 REQUIRED_IF="(AUTH_TYPE == 'ON_PREMISE') AND (MS_CRM_VERSION == 'CRM_2015')" />
             <IMPORT
-                NAME="stax2-api-3.1.4"
-                MODULE="stax2-api-3.1.4.jar"
-                MVN="mvn:org.talend.libraries/stax2-api-3.1.4/6.0.0"
-                UrlPath="platform:/plugin/org.talend.libraries.apache.cxf/lib/stax2-api-3.1.4.jar"
+                NAME="stax2-api-4.1"
+                MODULE="stax2-api-4.1.jar"
+                MVN="mvn:org.codehaus.woodstox/stax2-api/4.1"
                 REQUIRED_IF="(AUTH_TYPE == 'ON_PREMISE') AND (MS_CRM_VERSION == 'CRM_2015')" />
             <IMPORT
-                NAME="woodstox-core-5.0.3.jar"
-                MODULE="woodstox-core-5.0.3.jar"
-                MVN="mvn:com.fasterxml.woodstox/woodstox-core/5.0.3"
+                NAME="woodstox-core-5.1.0.jar"
+                MODULE="woodstox-core-5.1.0.jar"
+                MVN="mvn:com.fasterxml.woodstox/woodstox-core/5.1.0"
                 REQUIRED_IF="(AUTH_TYPE == 'ON_PREMISE') AND (MS_CRM_VERSION == 'CRM_2015')" />
             <IMPORT
                 NAME="wsdl4j-1.6.3"
@@ -29078,9 +29077,9 @@
                 MVN="mvn:org.apache.ws.xmlschema/xmlschema-core/2.2.3"
                 REQUIRED_IF="(AUTH_TYPE == 'ON_PREMISE') AND (MS_CRM_VERSION == 'CRM_2015')" />
             <IMPORT
-                NAME="xmlsec-2.1.1"
-                MODULE="xmlsec-2.1.1.jar"
-                MVN="mvn:org.apache.santuario/xmlsec/2.1.1"
+                NAME="xmlsec-2.1.2"
+                MODULE="xmlsec-2.1.2.jar"
+                MVN="mvn:org.apache.santuario/xmlsec/2.1.2"
                 REQUIRED_IF="(AUTH_TYPE == 'ON_PREMISE') AND (MS_CRM_VERSION == 'CRM_2015')" />
             <IMPORT
                 NAME="dom4j-1.6.1"

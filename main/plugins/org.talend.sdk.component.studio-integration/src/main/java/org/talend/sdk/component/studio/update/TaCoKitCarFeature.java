@@ -401,8 +401,8 @@ public class TaCoKitCarFeature extends AbstractExtraFeature implements ITaCoKitC
                         if (!TaCoKitUtil.isBlank(installedGAV.getClassifier())) {
                             installedVersion = installedVersion + "-" + installedGAV.getClassifier();
                         }
-                        Version nVer = Version.create(newVersion);
-                        Version iVer = Version.create(installedVersion);
+                        Version nVer = PathUtils.convert2Version(newVersion);
+                        Version iVer = PathUtils.convert2Version(installedVersion);
                         if (latestInstalledVersion == null) {
                             latestInstalledVersion = iVer;
                         } else {
